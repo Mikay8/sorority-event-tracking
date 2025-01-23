@@ -14,7 +14,7 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      {user ? <HomeScreen /> : <AuthStack />}
+      {user&&user.displayName  ? <HomeScreen /> : <AuthStack />}
     </NavigationContainer>
   );
 };

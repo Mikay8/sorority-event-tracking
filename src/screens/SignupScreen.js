@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
+import { AuthContext } from '../context/AuthContext';
 import { createUserWithEmailAndPassword,updateProfile } from 'firebase/auth';
 import { auth } from '../firebase';
 
 const SignupScreen = () => {
+  const { setUser } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -13,11 +15,12 @@ const SignupScreen = () => {
 
   const handleSignUp = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
       // Update display name
-      await updateProfile(user, { displayName: fName+" "+lName });
+      await updateProfile(user, { displayName: fName +" "+lName});
+      await auth.currentUser.reload();
+      setUser(userCredential.user); 
     } catch (err) {
       setError(err.message);
     }
