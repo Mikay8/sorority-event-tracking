@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword,updateProfile } from 'firebase/auth';
 import { auth } from '../firebase';
 
 const SignupScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [fName, setFName] = useState('');
+  const [lName, setLName] = useState('');
 
   const handleSignUp = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Update display name
+      await updateProfile(user, { displayName: fName+" "+lName });
     } catch (err) {
       setError(err.message);
     }
@@ -20,6 +26,18 @@ const SignupScreen = () => {
   return (
     <View style={styles.container}>
       <Text >Sign Up</Text>
+      <TextInput
+        label="First Name"
+        value={fName}
+        onChangeText={setFName}
+        style={styles.input}
+      />
+      <TextInput
+        label="Last Name"
+        value={lName}
+        onChangeText={setLName}
+        style={styles.input}
+      />
       <TextInput
         label="Email"
         value={email}
