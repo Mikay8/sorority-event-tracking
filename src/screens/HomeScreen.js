@@ -1,29 +1,29 @@
-import React, { useContext, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { View, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { AuthContext } from '../context/AuthContext';
 
 
-const HomeScreen = () => {
-  const { user } = useContext(AuthContext); // Get the user from the context
-  const handleLogout = async () => {
-    try {
-      await auth.signOut(); // Sign out the user
-    } catch (error) {
-      console.error('Error logging out:', error.message);
-    }
-  };
+const HomeScreen = ({ navigation }) => {
+  const { user, setUser } = useContext(AuthContext); // Get the user from the context
   return (
     <View style={styles.container}>
       <Text style={styles.welcome}>
         Welcome, {user?.displayName || 'User'}!
       </Text>
-      <Text style={styles.info}>You are logged in as {user?.email}</Text>
-      <Button mode="contained" onPress={handleLogout} style={styles.button}>
-        Logout
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.navigate('CalendarScreen')}
+      >
+        <Text style={styles.buttonText}>Go to Calendar</Text>
+      </TouchableOpacity>
+      <Button mode="contained" onPress={() => navigation.navigate('CalendarScreen')}>
+        Go to Calendar
       </Button>
+      <Text style={styles.info}>You are logged in as {user?.email}</Text>
+      
     </View>
   );
 };
