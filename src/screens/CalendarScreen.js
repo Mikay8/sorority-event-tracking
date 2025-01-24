@@ -1,16 +1,18 @@
 import React, { useEffect, useState,useCallback } from 'react';
-import { View, StyleSheet, Alert, FlatList } from 'react-native';
+import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import {  Button, Text } from 'react-native-paper';
+import {  Button, Text, Card } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
 import { getEvents } from '../services/firestore/events';
 import { format } from 'date-fns'; // A helper library for date formatting (install with `npm install date-fns`)
+import { useTheme } from 'react-native-paper';
+import EventCard from '../components/EventCard';
 
 const CalendarScreen = ({navigation}) => {
   const [events, setEvents] = useState({});
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedEvents, setSelectedEvents] = useState([]);
-
+  const theme = useTheme();
   useFocusEffect(
     useCallback(() => {
       const fetchEvents = async () => {
@@ -25,7 +27,7 @@ const CalendarScreen = ({navigation}) => {
   
             // Add event to the corresponding date in `formattedEvents`
             if (!formattedEvents[dateKey]) {
-              formattedEvents[dateKey] = { marked: true, dotColor: 'blue', events: [] };
+              formattedEvents[dateKey] = { marked: true, dotColor: theme.colors.secondary, events: [] };
             }
             formattedEvents[dateKey].events.push(event);
           });
@@ -47,7 +49,16 @@ const CalendarScreen = ({navigation}) => {
     const dayEvents = events[day.dateString]?.events || [];
     setSelectedEvents(dayEvents);
   };
-
+  const renderEvent = ({ item }) => (
+    <EventCard
+    title={item.title}
+    description={item.description}
+    location={item.location}
+    onEdit={() => {}}
+    onDelete={() => {}}
+    addUsers={() => {}}
+  />
+  );
   return (
     <View style={styles.container}>
       <Button onPress={() => navigation.navigate('AddEventScreen')}>
@@ -59,32 +70,23 @@ const CalendarScreen = ({navigation}) => {
           return acc;
         }, {})}
         onDayPress={handleDayPress}
-        theme={{
-          selectedDayBackgroundColor: 'blue',
-          todayTextColor: 'purple',
-          arrowColor: 'blue',
-        }}
+        
       />
       {selectedDate && (
-        <View style={styles.detailsContainer}>
+        <ScrollView style={styles.detailsContainer}>
           <Text style={styles.selectedDate}>Events on {selectedDate}:</Text>
           {selectedEvents.length > 0 ? (
             <FlatList
-              data={selectedEvents}
-              keyExtractor={(item, index) => index.toString()}
-              renderItem={({ item }) => (
-                <View style={styles.eventItem}>
-                  <Text style={styles.eventTitle}>{item.title}</Text>
-                  <Text>Description: {item.description}</Text>
-                  <Text>Location: {item.location}</Text>
-                  <Text>Created By: {item.createdBy.id}</Text>
-                </View>
-              )}
-            />
+            data={selectedEvents}
+            keyExtractor={(item) => item.id} // Ensure each event has a unique `id`
+            renderItem={renderEvent}
+            contentContainerStyle={styles.list}
+            ListEmptyComponent={<Text style={styles.noEvents}>No events for this day</Text>}
+          />
           ) : (
             <Text>No events for this day.</Text>
           )}
-        </View>
+        </ScrollView>
       )}
     </View>
   );
@@ -92,16 +94,13 @@ const CalendarScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+  
     padding: 10,
-    backgroundColor: '#fff',
   },
   detailsContainer: {
-    marginTop: 20,
+
     padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    height: '300px'
   },
   selectedDate: {
     fontSize: 18,
@@ -109,17 +108,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
-  eventItem: {
-    marginBottom: 10,
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 5,
+
+  list: {
+    padding: 16,
   },
-  eventTitle: {
+  noEvents: {
+    textAlign: 'center',
+  
     fontSize: 16,
-    fontWeight: 'bold',
+    marginTop: 20,
   },
 });
 

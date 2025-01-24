@@ -7,6 +7,8 @@ const theme = {
   colors: {
     ...DefaultTheme.colors,
     primary: '#007bff', // Primary color (blue)
+    secondary:'#ff4081',// Accent color (pink)
+    tertiary:'#ff4081',// Accent color (pink)
     accent: '#ff4081',  // Accent color (pink)
     background: '#f4f4f4', // Background color (light gray)
     surface: '#ffffff', // Surface color (white)
@@ -16,24 +18,17 @@ const theme = {
     success: '#4caf50', // Success color (green)
   },
   roundness: 10, // Rounded corners
-  fonts: {
-    regular: {
-      fontFamily: 'Roboto-Regular',
-      fontWeight: 'normal',
-    },
-    medium: {
-      fontFamily: 'Roboto-Medium',
-      fontWeight: 'normal',
-    },
-    light: {
-      fontFamily: 'Roboto-Light',
-      fontWeight: 'normal',
-    },
-    thin: {
-      fontFamily: 'Roboto-Thin',
-      fontWeight: 'normal',
+  typescale: {
+    ...DefaultTheme.typescale,
+    displayMedium: {
+      fontFamily: 'Roboto', // Or any custom font
+      fontWeight: '500',
+      fontSize: 16, // Custom font size
+      lineHeight: 24, // Custom line height
+      letterSpacing: 0.15, // Custom letter spacing
     },
   },
+  
 };
 
 export default theme;

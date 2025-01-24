@@ -4,7 +4,7 @@ import { PaperProvider } from 'react-native-paper';
 import AuthStack from './AuthStack';
 import MainStack from './MainStack'; 
 import { AuthContext } from '../context/AuthContext';
-
+import theme from '../themes/lightColors'
 
 const AppNavigator = () => {
   const { user, loading } = useContext(AuthContext);
@@ -15,7 +15,7 @@ const AppNavigator = () => {
   }
 
   return (
-    <PaperProvider >
+    <PaperProvider theme={theme} >
       {user ? <MainStack/> : <AuthStack />}
     </PaperProvider>
   );
