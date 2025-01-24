@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useCallback } from 'react';
 import { View, StyleSheet, Alert, FlatList } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import {  Button, Text } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
 import { getEvents } from '../services/firestore/events';
@@ -10,33 +11,35 @@ const CalendarScreen = ({navigation}) => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedEvents, setSelectedEvents] = useState([]);
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const fetchedEvents = await getEvents();
-
-        // Transform events into a format suitable for react-native-calendars
-        const formattedEvents = {};
-        fetchedEvents.forEach((event) => {
-          // Convert Firestore timestamp to 'YYYY-MM-DD' format
-          const dateKey = format(event.date.toDate(), 'yyyy-MM-dd');
-
-          // Add event to the corresponding date in `formattedEvents`
-          if (!formattedEvents[dateKey]) {
-            formattedEvents[dateKey] = { marked: true, dotColor: 'blue', events: [] };
-          }
-          formattedEvents[dateKey].events.push(event);
-        });
-
-        setEvents(formattedEvents);
-      } catch (error) {
-        console.error('Error fetching events:', error);
-      }
-    };
-
-    fetchEvents();
-  }, []);
-
+  useFocusEffect(
+    useCallback(() => {
+      const fetchEvents = async () => {
+        try {
+          const fetchedEvents = await getEvents();
+  
+          // Transform events into a format suitable for react-native-calendars
+          const formattedEvents = {};
+          fetchedEvents.forEach((event) => {
+            // Convert Firestore timestamp to 'YYYY-MM-DD' format
+            const dateKey = event.date;
+  
+            // Add event to the corresponding date in `formattedEvents`
+            if (!formattedEvents[dateKey]) {
+              formattedEvents[dateKey] = { marked: true, dotColor: 'blue', events: [] };
+            }
+            formattedEvents[dateKey].events.push(event);
+          });
+  
+          setEvents(formattedEvents);
+        } catch (error) {
+          console.error('Error fetching events:', error);
+        }
+      };
+  
+      fetchEvents();
+    
+    }, [])
+  );
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
 

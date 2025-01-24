@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert, Platform } from 'react-native';
+import { View, StyleSheet, Alert, Button, } from 'react-native';
+import TextInputWrapper from '../components/TextInputWrapper';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { useNavigation } from '@react-navigation/native';
 import { addEvent } from '../services/firestore/events'; // Import addEvent function
@@ -28,10 +29,7 @@ const AddEventScreen = () => {
         Alert.alert('Error', 'Please fill in all fields.');
         return;
       }
-
       await addEvent(title, description, location, date, user.uid);
-
-      Alert.alert('Success', 'Event added successfully.');
       navigation.goBack(); // Navigate back to the previous screen (e.g., Calendar screen)
     } catch (error) {
       //console.error('Error adding event:', error);
@@ -40,34 +38,31 @@ const AddEventScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Add Event</Text>
-      <Text style={styles.label}>Title</Text>
-      <TextInput
-        style={styles.input}
+    <View >
+      
+      <TextInputWrapper
+        label={"Title"}
         value={title}
         onChangeText={setTitle}
+        type="required" // Triggers password validation
       />
-      <Text style={styles.label}>Description</Text>
-      <TextInput
-        style={styles.input}
+      <TextInputWrapper
+        label={"Description"}
         value={description}
         onChangeText={setDescription}
-      
+        type="required" // Triggers password validation
       />
-      <Text style={styles.label}>Location</Text>
-      <TextInput
-        style={styles.input}
+      
+      <TextInputWrapper
+        label={"Location"}
         value={location}
         onChangeText={setLocation}
+        type="required" // Triggers password validation
       />
-
-      <Text style={styles.label}>Event Date</Text>
-      <TextInput
-        style={styles.input}
+      <TextInputWrapper
+        label={"Date"}
         value={format(date, 'yyyy-MM-dd')}
-        onFocus={() => setShowDatePicker(true)} // Show date picker on focus
-        editable={false} // Make it read-only
+        onFocus={() => setShowDatePicker(true)} 
       />
       <DatePickerModal
         mode="single"
@@ -82,31 +77,5 @@ const AddEventScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  input: {
-    height: 50,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-  },
-  label: {
-    marginTop: 10,
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-});
 
 export default AddEventScreen;

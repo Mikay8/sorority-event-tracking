@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import { createUserWithEmailAndPassword,updateProfile } from 'firebase/auth';
+import TextInputWrapper from '../components/TextInputWrapper';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { saveUserProfile } from '../services/firestore/users';
 import { auth, db } from '../firebase';
@@ -38,31 +39,33 @@ const SignupScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text >Sign Up</Text>
-      <TextInput
-        label="First Name"
+      
+      <TextInputWrapper
+        label={"First Name"}
         value={fName}
         onChangeText={setFName}
-        style={styles.input}
+        type="required" // Triggers password validation
       />
-      <TextInput
-        label="Last Name"
+      
+      <TextInputWrapper
+        label={"Last Name"}
         value={lName}
         onChangeText={setLName}
-        style={styles.input}
+        type="required" // Triggers password validation
       />
-      <TextInput
-        label="Email"
+      
+      <TextInputWrapper
+        label={"Email"}
         value={email}
         onChangeText={setEmail}
-        style={styles.input}
+        type="email" // Triggers password validation
       />
-      <TextInput
-        label="Password"
+      
+      <TextInputWrapper
+        label={"Password"}
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
+        type="password" // Triggers password validation
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Button mode="contained" onPress={handleSignUp}>

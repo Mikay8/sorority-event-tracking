@@ -4,6 +4,7 @@ import { TextInput, Button, Text } from 'react-native-paper';
 import { signInWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { auth } from '../firebase';
 import { AuthContext } from '../context/AuthContext';
+import TextInputWrapper from '../components/TextInputWrapper';
 
 const LoginScreen = () => {
   const { setUser } = useContext(AuthContext);
@@ -22,19 +23,19 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text >Login</Text>
-      <TextInput
-        label="Email"
+      
+      <TextInputWrapper
+        label={"Email"}
         value={email}
         onChangeText={setEmail}
-        style={styles.input}
+        type="email" // Triggers password validation
       />
-      <TextInput
-        label="Password"
+      
+      <TextInputWrapper
+        label={"Password"}
         value={password}
         onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
+        type="password" // Triggers password validation
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Button mode="contained" onPress={handleLogin}>

@@ -1,5 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import { NavigationContainer, ThemeProvider } from '@react-navigation/native';
+import { PaperProvider } from 'react-native-paper';
 import AuthStack from './AuthStack';
 import MainStack from './MainStack'; 
 import { AuthContext } from '../context/AuthContext';
@@ -14,9 +15,9 @@ const AppNavigator = () => {
   }
 
   return (
-    <ThemeProvider>
+    <PaperProvider >
       {user ? <MainStack/> : <AuthStack />}
-    </ThemeProvider>
+    </PaperProvider>
   );
 };
 

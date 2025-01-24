@@ -10,7 +10,7 @@ const HomeScreen = ({ navigation }) => {
   const { user, setUser } = useContext(AuthContext); // Get the user from the context
   return (
     <View style={styles.container}>
-      <Text style={styles.welcome}>
+      <Text variant="displayMedium">
         Welcome, {user?.displayName || 'User'}!
       </Text>
       <TouchableOpacity
