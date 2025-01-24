@@ -6,10 +6,10 @@ const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#007bff', // Primary color (blue)
-    secondary:'#ff4081',// Accent color (pink)
-    tertiary:'#ff4081',// Accent color (pink)
-    accent: '#ff4081',  // Accent color (pink)
+    //primary: '#007bff', // Primary color (blue)
+    //secondary:'#ff4081',// Accent color (pink)
+    //tertiary:'#ff4081',// Accent color (pink)
+    //accent: '#ff4081',  // Accent color (pink)
     background: '#f4f4f4', // Background color (light gray)
     surface: '#ffffff', // Surface color (white)
     text: '#333333', // Text color (dark gray)

@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Card, Text, Button } from 'react-native-paper';
 import { useTheme } from 'react-native-paper';
 
-const EventCard = ({ title, description, location, onEdit, onDelete, addUsers }) => {
+const EventCard = ({ title, description, location, onEdit, attendance }) => {
   const theme = useTheme();
   return (
     <Card style={[styles.card,{backgroundColor:theme.colors.background}]}>
@@ -16,11 +16,8 @@ const EventCard = ({ title, description, location, onEdit, onDelete, addUsers })
         <Button mode="contained" onPress={onEdit} style={styles.button}>
           Edit
         </Button>
-        <Button mode="contained" onPress={onDelete} style={styles.button}buttonColor={theme.colors.error}>
-          Delete
-        </Button>
-        <Button mode="contained" onPress={addUsers} style={styles.button}>
-          Add Attendance
+        <Button mode="contained" onPress={attendance} style={styles.button}>
+           Attendance
         </Button>
       </Card.Actions>
     </Card>

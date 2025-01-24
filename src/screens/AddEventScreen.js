@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
-import { View, StyleSheet, Alert, Button, } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
+import {  Button, } from 'react-native-paper';
 import TextInputWrapper from '../components/TextInputWrapper';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { useNavigation } from '@react-navigation/native';
@@ -71,8 +72,10 @@ const AddEventScreen = () => {
         onDismiss={() => setShowDatePicker(false)}
         onConfirm={handleDateChange}
       />
-
-      <Button title="Add Event" onPress={handleAddEvent} />
+      <div style={{ padding:'16px'}}>
+        <Button title="Add Event" mode="contained" onPress={handleAddEvent}>Add Event</Button>
+    
+      </div>
     </View>
   );
 };

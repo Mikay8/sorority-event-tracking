@@ -65,6 +65,7 @@ const SignupScreen = () => {
         label={"Password"}
         value={password}
         onChangeText={setPassword}
+        secureTextEntry
         type="password" // Triggers password validation
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}

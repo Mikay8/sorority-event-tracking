@@ -36,6 +36,7 @@ const LoginScreen = () => {
         value={password}
         onChangeText={setPassword}
         type="password" // Triggers password validation
+        secureTextEntry
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Button mode="contained" onPress={handleLogin}>

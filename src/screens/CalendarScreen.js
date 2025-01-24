@@ -3,16 +3,23 @@ import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import {  Button, Text, Card } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
-import { getEvents } from '../services/firestore/events';
+import { getEvents,updateEvent,deleteEvent,getEventAttendees } from '../services/firestore/events';
 import { format } from 'date-fns'; // A helper library for date formatting (install with `npm install date-fns`)
 import { useTheme } from 'react-native-paper';
 import EventCard from '../components/EventCard';
+import EditEventModal from '../components/EditEventModal';
+import AttendanceGrid from '../components/AttendanceGrid';
 
 const CalendarScreen = ({navigation}) => {
   const [events, setEvents] = useState({});
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedEvents, setSelectedEvents] = useState([]);
+  const [editingEvent, setEditingEvent] = useState(null); // Event being edited
+  const [isModalVisible, setModalVisible] = useState(false); 
+  const [attendees, setAttendees] = useState(null); // Currently selected event
+  const [attendanceModalVisible, setAttendanceModalVisible] = useState(false); // Modal visibility state
   const theme = useTheme();
+  
   useFocusEffect(
     useCallback(() => {
       const fetchEvents = async () => {
@@ -40,7 +47,7 @@ const CalendarScreen = ({navigation}) => {
   
       fetchEvents();
     
-    }, [])
+    }, [isModalVisible==false])
   );
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
@@ -49,21 +56,57 @@ const CalendarScreen = ({navigation}) => {
     const dayEvents = events[day.dateString]?.events || [];
     setSelectedEvents(dayEvents);
   };
+  const handleEdit = (event) => {
+    setEditingEvent(event);
+    setModalVisible(true);
+  };
+  const handleDelete = async () => {
+    
+    try {
+      await deleteEvent(editingEvent.id);
+      setModalVisible(false);
+      setEditingEvent(null);
+    } catch (error) {
+      console.error('Error updating event:', error);
+    }
+  };
+  const handleAttendance = async (event) => {
+    
+    try {
+      const attendees= await getEventAttendees(event.id);
+      setAttendees(attendees);
+      
+    } catch (error) {
+      console.error('Error updating event:', error);
+    }finally{
+      setAttendanceModalVisible(true);
+    }
+    
+  };
+
+  const handleSave =async () => {
+    try {
+      await updateEvent(editingEvent.id, editingEvent);
+      setModalVisible(false);
+      setEditingEvent(null);
+    } catch (error) {
+      console.error('Error updating event:', error);
+    }
+  };
   const renderEvent = ({ item }) => (
     <EventCard
     title={item.title}
     description={item.description}
     location={item.location}
-    onEdit={() => {}}
-    onDelete={() => {}}
-    addUsers={() => {}}
+    onEdit={()=>handleEdit(item)}
+    attendance={() => handleAttendance(item)}
   />
   );
   return (
     <View style={styles.container}>
-      <Button onPress={() => navigation.navigate('AddEventScreen')}>
-                Add Calendar
-            </Button>
+            <div style={{padding:'16px'}}>
+              <Button title="Add Event" mode="contained" onPress={() => navigation.navigate('AddEventScreen')}>Add Event</Button>
+            </div>
       <Calendar
         markedDates={Object.keys(events).reduce((acc, date) => {
           acc[date] = { marked: true, dotColor: events[date].dotColor };
@@ -88,6 +131,19 @@ const CalendarScreen = ({navigation}) => {
           )}
         </ScrollView>
       )}
+      <EditEventModal
+        visible={isModalVisible}
+        event={editingEvent}
+        onChangeEvent={setEditingEvent}
+        onSave={handleSave}
+        onDelete={handleDelete}
+        onClose={() => setModalVisible(false)}
+      />
+       <AttendanceGrid
+        visible={attendanceModalVisible}
+        onDismiss={() => setAttendanceModalVisible(false)}
+        attendees={attendees} // Pass the `attendance` array from the selected event
+      />
     </View>
   );
 };
