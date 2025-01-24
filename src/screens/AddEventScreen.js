@@ -1,71 +1,112 @@
 import React, { useState, useContext } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
+import { View, Text, TextInput, Button, StyleSheet, Alert, Platform } from 'react-native';
+import { DatePickerModal } from 'react-native-paper-dates';
+import { useNavigation } from '@react-navigation/native';
+import { addEvent } from '../services/firestore/events'; // Import addEvent function
+import { format } from 'date-fns'; // For date formatting
 import { AuthContext } from '../context/AuthContext';
-import { createUserWithEmailAndPassword,updateProfile } from 'firebase/auth';
-import { auth } from '../firebase';
 
 const AddEventScreen = () => {
-  const { setUser } = useContext(AuthContext);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [fName, setFName] = useState('');
-  const [lName, setLName] = useState('');
+  const navigation = useNavigation();
+  const { user, setUser } = useContext(AuthContext);
+  // State to store form data and date picker visibility
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [location, setLocation] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const handleSignUp = async () => {
+  // Function to handle date change from DateTimePicker
+  const handleDateChange = (newDate) => {
+    setDate(newDate.date);
+    setShowDatePicker(false); // Close the date picker
+  };
+  // Function to handle adding event
+  const handleAddEvent = async () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      // Update display name
-      await updateProfile(user, { displayName: fName +" "+lName});
-      await auth.currentUser.reload();
-      setUser(userCredential.user); 
-    } catch (err) {
-      setError(err.message);
+      if (!title || !description || !location) {
+        Alert.alert('Error', 'Please fill in all fields.');
+        return;
+      }
+
+      await addEvent(title, description, location, date, user.uid);
+
+      Alert.alert('Success', 'Event added successfully.');
+      navigation.goBack(); // Navigate back to the previous screen (e.g., Calendar screen)
+    } catch (error) {
+      //console.error('Error adding event:', error);
+      Alert.alert('Error', 'There was an error saving the event.');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text >Event</Text>
+      <Text style={styles.header}>Add Event</Text>
+      <Text style={styles.label}>Title</Text>
       <TextInput
-        label="First Name"
-        value={fName}
-        onChangeText={setFName}
         style={styles.input}
+        value={title}
+        onChangeText={setTitle}
       />
+      <Text style={styles.label}>Description</Text>
       <TextInput
-        label="Last Name"
-        value={lName}
-        onChangeText={setLName}
         style={styles.input}
+        value={description}
+        onChangeText={setDescription}
+      
       />
+      <Text style={styles.label}>Location</Text>
       <TextInput
-        label="Email"
-        value={email}
-        onChangeText={setEmail}
         style={styles.input}
+        value={location}
+        onChangeText={setLocation}
       />
+
+      <Text style={styles.label}>Event Date</Text>
       <TextInput
-        label="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
         style={styles.input}
+        value={format(date, 'yyyy-MM-dd')}
+        onFocus={() => setShowDatePicker(true)} // Show date picker on focus
+        editable={false} // Make it read-only
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button mode="contained" onPress={handleSignUp}>
-        Sign Up
-      </Button>
+      <DatePickerModal
+        mode="single"
+        visible={showDatePicker}
+        date={date}
+        onDismiss={() => setShowDatePicker(false)}
+        onConfirm={handleDateChange}
+      />
+
+      <Button title="Add Event" onPress={handleAddEvent} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
-  input: { marginBottom: 10 },
-  error: { color: 'red', marginBottom: 10 },
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  input: {
+    height: 50,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  label: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
 
 export default AddEventScreen;

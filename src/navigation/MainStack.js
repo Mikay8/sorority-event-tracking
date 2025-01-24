@@ -9,12 +9,14 @@ import CalendarScreen from '../screens/CalendarScreen';
 import AddEventScreen from '../screens/AddEventScreen'
 import { AuthContext } from '../context/AuthContext';
 import RightToolBar from '../components/RightToolBar';
+import { getUserProfile } from '../services/firestore/users';
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
   const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
-  const [displayName, setDisplayName] = useState('');
+  //const [displayName, setDisplayName] = useState('');
+  const [userData, setUserData] = useState(null);
 
   const handleLogout = async () => {
     try {
@@ -25,21 +27,23 @@ const AppNavigator = () => {
     }
   };
   useEffect(() => {
-    const fetchDisplayName = async () => {
+    const fetchUser = async () => {
       try {
         if (auth.currentUser) {
           // Reload user data from Firebase to ensure displayName is up to date
           await auth.currentUser.reload();
-          setDisplayName(auth.currentUser.displayName || 'User'); // Default to 'User' if no displayName exists
+          const profile = await getUserProfile(auth.currentUser.uid);
+          //setDisplayName(profile.displayName || 'User'); // Default to 'User' if no displayName exists
+          setUserData(profile)
         }
       } catch (error) {
-        console.error('Error fetching displayName:', error);
+        console.error('Error fetching user:', error);
       } finally {
         setLoading(false); // Stop the loading spinner once displayName is fetched
       }
     };
 
-    fetchDisplayName();
+    fetchUser();
   }, []);
 
   if (loading) {
@@ -58,10 +62,11 @@ const AppNavigator = () => {
         <Stack.Screen name="HomeScreen" component={HomeScreen} options={
           { title: 'Home', 
             headerRight: () => (
-            <RightToolBar displayName={displayName || 'User'} logout={handleLogout} />
+            <RightToolBar displayName={userData.displayName} logout={handleLogout} />
           ), }
           } />
-        <Stack.Screen name="CalendarScreen" component={CalendarScreen} options={{ title: 'Calendar' }} />
+        <Stack.Screen name="CalendarScreen" component={CalendarScreen} options={{ title: 'Calendar',   
+        }} />
         <Stack.Screen name="AddEventScreen" component={AddEventScreen} options={{ title: 'Add Event' }} />
       </Stack.Navigator>
     </NavigationContainer>
@@ -69,9 +74,8 @@ const AppNavigator = () => {
 };
 const HeaderRight = ({ displayName, logout }) => (
   <div style={{ marginRight: 10 }}>
-    <Text style={{ fontWeight: 'bold' }}>{displayName}</Text>
     <Button mode="contained" onPress={logout}>
-        Log Out
+        {displayName}
     </Button>
   </div>
 );

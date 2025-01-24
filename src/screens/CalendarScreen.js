@@ -1,61 +1,88 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Alert, FlatList } from 'react-native';
+import {  Button, Text } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
+import { getEvents } from '../services/firestore/events';
+import { format } from 'date-fns'; // A helper library for date formatting (install with `npm install date-fns`)
 
-const CalendarScreen = () => {
+const CalendarScreen = ({navigation}) => {
+  const [events, setEvents] = useState({});
   const [selectedDate, setSelectedDate] = useState('');
-  const [events, setEvents] = useState({
-    '2025-01-25': [{ id: 1, name: 'Sorority Meeting', time: '3:00 PM' }],
-    '2025-01-26': [{ id: 2, name: 'Volunteer Event', time: '10:00 AM' }],
-  });
+  const [selectedEvents, setSelectedEvents] = useState([]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const fetchedEvents = await getEvents();
+
+        // Transform events into a format suitable for react-native-calendars
+        const formattedEvents = {};
+        fetchedEvents.forEach((event) => {
+          // Convert Firestore timestamp to 'YYYY-MM-DD' format
+          const dateKey = format(event.date.toDate(), 'yyyy-MM-dd');
+
+          // Add event to the corresponding date in `formattedEvents`
+          if (!formattedEvents[dateKey]) {
+            formattedEvents[dateKey] = { marked: true, dotColor: 'blue', events: [] };
+          }
+          formattedEvents[dateKey].events.push(event);
+        });
+
+        setEvents(formattedEvents);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    fetchEvents();
+  }, []);
 
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
-  };
 
-  const renderEventItem = ({ item }) => (
-    <View style={styles.eventItem}>
-      <Text style={styles.eventName}>{item.name}</Text>
-      <Text style={styles.eventTime}>{item.time}</Text>
-    </View>
-  );
+    // Display events for the selected day
+    const dayEvents = events[day.dateString]?.events || [];
+    setSelectedEvents(dayEvents);
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Calendar</Text>
-
+      <Button onPress={() => navigation.navigate('AddEventScreen')}>
+                Add Calendar
+            </Button>
       <Calendar
+        markedDates={Object.keys(events).reduce((acc, date) => {
+          acc[date] = { marked: true, dotColor: events[date].dotColor };
+          return acc;
+        }, {})}
         onDayPress={handleDayPress}
-        markedDates={{
-          ...Object.keys(events).reduce((acc, date) => {
-            acc[date] = { marked: true };
-            return acc;
-          }, {}),
-          [selectedDate]: { selected: true, marked: true, selectedColor: '#007bff' },
-        }}
         theme={{
-          selectedDayBackgroundColor: '#007bff',
-          todayTextColor: '#007bff',
-          arrowColor: '#007bff',
+          selectedDayBackgroundColor: 'blue',
+          todayTextColor: 'purple',
+          arrowColor: 'blue',
         }}
       />
-
-      <View style={styles.eventsContainer}>
-        <Text style={styles.selectedDateText}>
-          {selectedDate ? `Events on ${selectedDate}` : 'Select a date to view events'}
-        </Text>
-        {selectedDate && events[selectedDate] ? (
-          <FlatList
-            data={events[selectedDate]}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderEventItem}
-          />
-        ) : (
-          selectedDate && (
-            <Text style={styles.noEventsText}>No events scheduled for this day.</Text>
-          )
-        )}
-      </View>
+      {selectedDate && (
+        <View style={styles.detailsContainer}>
+          <Text style={styles.selectedDate}>Events on {selectedDate}:</Text>
+          {selectedEvents.length > 0 ? (
+            <FlatList
+              data={selectedEvents}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item }) => (
+                <View style={styles.eventItem}>
+                  <Text style={styles.eventTitle}>{item.title}</Text>
+                  <Text>Description: {item.description}</Text>
+                  <Text>Location: {item.location}</Text>
+                  <Text>Created By: {item.createdBy.id}</Text>
+                </View>
+              )}
+            />
+          ) : (
+            <Text>No events for this day.</Text>
+          )}
+        </View>
+      )}
     </View>
   );
 };
@@ -63,49 +90,33 @@ const CalendarScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f8f9fa',
+    padding: 10,
+    backgroundColor: '#fff',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  eventsContainer: {
-    flex: 1,
+  detailsContainer: {
     marginTop: 20,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
   },
-  selectedDateText: {
+  selectedDate: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
     textAlign: 'center',
   },
-  noEventsText: {
-    fontSize: 16,
-    color: '#6c757d',
-    textAlign: 'center',
-    marginTop: 10,
-  },
   eventItem: {
-    backgroundColor: '#ffffff',
-    padding: 15,
-    marginVertical: 8,
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 3,
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: '#f9f9f9',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
   },
-  eventName: {
+  eventTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  eventTime: {
-    fontSize: 14,
-    color: '#6c757d',
   },
 });
 

@@ -3,7 +3,9 @@ import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
 import { createUserWithEmailAndPassword,updateProfile } from 'firebase/auth';
-import { auth } from '../firebase';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { saveUserProfile } from '../services/firestore/users';
+import { auth, db } from '../firebase';
 
 const SignupScreen = () => {
   const { setUser } = useContext(AuthContext);
@@ -19,7 +21,15 @@ const SignupScreen = () => {
       const user = userCredential.user;
       // Update display name
       await updateProfile(user, { displayName: fName +" "+lName});
-      await auth.currentUser.reload();
+       // Save user profile to Firestore
+       await saveUserProfile(user.uid, {
+        displayName: fName+' '+lName,
+        firstName:fName,
+        lastName:lName,
+        email: email,
+        role: 'user', // Default role
+        photoURL: '', // Placeholder for profile photo
+      });
       setUser(userCredential.user); 
     } catch (err) {
       setError(err.message);

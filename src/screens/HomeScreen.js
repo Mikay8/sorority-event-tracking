@@ -17,7 +17,7 @@ const HomeScreen = ({ navigation }) => {
         style={styles.button}
         onPress={() => navigation.navigate('CalendarScreen')}
       >
-        <Text style={styles.buttonText}>Go to Calendar</Text>
+     
       </TouchableOpacity>
       <Button mode="contained" onPress={() => navigation.navigate('CalendarScreen')}>
         Go to Calendar
