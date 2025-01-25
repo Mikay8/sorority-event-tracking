@@ -22,6 +22,9 @@ const HomeScreen = ({ navigation }) => {
       <Button mode="contained" onPress={() => navigation.navigate('CalendarScreen')}>
         Go to Calendar
       </Button>
+      <Button mode="contained" onPress={() => navigation.navigate('ScanForEventsScreen')}>
+         Scan For Events Screen
+      </Button>
       <Text style={styles.info}>You are logged in as {user?.email}</Text>
       
     </View>

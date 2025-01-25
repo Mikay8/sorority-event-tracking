@@ -6,10 +6,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { auth } from '../firebase';
 import HomeScreen from '../screens/HomeScreen'; 
 import CalendarScreen from '../screens/CalendarScreen';
+import ScanForEventsScreen from '../screens/ScanForEventsScreen';
+import EventScanScreen from '../screens/EventScanScreen'
 import AddEventScreen from '../screens/AddEventScreen'
 import { AuthContext } from '../context/AuthContext';
 import RightToolBar from '../components/RightToolBar';
 import { getUserProfile } from '../services/firestore/users';
+
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
@@ -68,6 +71,8 @@ const AppNavigator = () => {
         <Stack.Screen name="CalendarScreen" component={CalendarScreen} options={{ title: 'Calendar',   
         }} />
         <Stack.Screen name="AddEventScreen" component={AddEventScreen} options={{ title: 'Add Event' }} />
+        <Stack.Screen name="ScanForEventsScreen" component={ScanForEventsScreen} options={{ title: 'Scan For Events Screen' }} />
+        <Stack.Screen name="EventScanScreen" component={EventScanScreen} options={{title:'Scan Event'}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
