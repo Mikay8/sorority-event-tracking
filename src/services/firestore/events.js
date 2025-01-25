@@ -1,4 +1,4 @@
-import { doc, updateDoc, collection, getDocs,getDoc, addDoc, deleteDoc} from 'firebase/firestore';
+import { doc, updateDoc, collection, getDocs,getDoc, addDoc, deleteDoc, arrayRemove,arrayUnion} from 'firebase/firestore';
 import { getUserProfile } from './users';
 import firestore from '@react-native-firebase/firestore';
 import { db } from '../../firebase';
@@ -47,32 +47,19 @@ import { format } from 'date-fns'
       throw new Error('There was an error updating the event');
     }
   };
-  export const updateEventAttendance = async (eventId, userId) => {
+  export const removeUserFromEvent = async (eventId, userId) => {
     try {
-      const eventRef = firestore().collection('events').doc(eventId);
+      const eventRef = doc(db, 'events', eventId);
   
-      await firestore().runTransaction(async (transaction) => {
-        const eventDoc = await transaction.get(eventRef);
-  
-        if (!eventDoc.exists) {
-          throw new Error('Event does not exist!');
-        }
-  
-        const eventData = eventDoc.data();
-        const currentAttendance = eventData.attendance || [];
-  
-        if (!currentAttendance.includes(userId)) {
-          transaction.update(eventRef, {
-            attendance: firestore.FieldValue.arrayUnion(userId),
-          });
-          console.log(`User ${userId} added to attendance for event ${eventId}`);
-        } else {
-          console.log(`User ${userId} is already in attendance for event ${eventId}`);
-        }
+      // Use Firestore's `arrayRemove` to remove the user ID from the `attendees` array
+      await updateDoc(eventRef, {
+        attendees: arrayRemove(userId),
       });
+  
+      console.log(`User ${userId} removed from attendees list successfully!`);
     } catch (error) {
-      console.error('Error updating event attendance:', error);
-      throw error;
+      console.error('Error removing user from attendees list:', error);
+      throw new Error('There was an error removing the user from the attendees list');
     }
   };
   export const deleteEvent = async (eventId) => {
@@ -111,5 +98,38 @@ import { format } from 'date-fns'
     } catch (error) {
       console.error('Error getting event attendees:', error);
       throw error;
+    }
+  };
+  export const addUserToEvent = async (eventId, userId) => {
+    try {
+      // Step 1: Verify if the user exists
+      const userProfile = await getUserProfile(userId);
+      if (!userProfile) {
+        throw new Error(`User with ID ${userId} does not exist.`);
+      }
+  
+      // Step 2: Check if the user is already in the attendees list
+      const eventRef = doc(db, 'events', eventId);
+      const eventSnap = await getDoc(eventRef);
+  
+      if (!eventSnap.exists()) {
+        throw new Error(`Event with ID ${eventId} does not exist.`);
+      }
+  
+      const eventData = eventSnap.data();
+      if (eventData.attendees && eventData.attendees.includes(userId)) {
+        console.log(`User ${userId} is already an attendee of event ${eventId}.`);
+        return; // Exit early if the user is already in the array
+      }
+  
+      // Step 3: Add user to the attendees list
+      await updateDoc(eventRef, {
+        attendees: arrayUnion(userId), // Use arrayUnion to add the user ID to the array
+      });
+  
+      console.log(`User ${userId} added to attendees list for event ${eventId}.`);
+    } catch (error) {
+      console.error('Error adding user to attendees list:', error);
+      throw new Error('There was an error adding the user to the attendees list');
     }
   };

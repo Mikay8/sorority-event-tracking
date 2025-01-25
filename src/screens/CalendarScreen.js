@@ -3,12 +3,14 @@ import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import {  Button, Text, Card } from 'react-native-paper';
 import { Calendar } from 'react-native-calendars';
-import { getEvents,updateEvent,deleteEvent,getEventAttendees } from '../services/firestore/events';
+import { getAllUsers } from '../services/firestore/users';
+import { getEvents,updateEvent,deleteEvent,getEventAttendees, removeUserFromEvent } from '../services/firestore/events';
 import { format } from 'date-fns'; // A helper library for date formatting (install with `npm install date-fns`)
 import { useTheme } from 'react-native-paper';
 import EventCard from '../components/EventCard';
 import EditEventModal from '../components/EditEventModal';
 import AttendanceGrid from '../components/AttendanceGrid';
+import AddUserModal from '../components/AddUserModal';
 
 const CalendarScreen = ({navigation}) => {
   const [events, setEvents] = useState({});
@@ -17,7 +19,9 @@ const CalendarScreen = ({navigation}) => {
   const [editingEvent, setEditingEvent] = useState(null); // Event being edited
   const [isModalVisible, setModalVisible] = useState(false); 
   const [attendees, setAttendees] = useState(null); // Currently selected event
-  const [attendanceModalVisible, setAttendanceModalVisible] = useState(false); // Modal visibility state
+  const [attendanceModalVisible, setAttendanceModalVisible] = useState(false); // Modal visibility state    
+  const [isAddUserModalVisible, setAddUserModalVisible] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
   const theme = useTheme();
   
   useFocusEffect(
@@ -75,6 +79,7 @@ const CalendarScreen = ({navigation}) => {
     try {
       const attendees= await getEventAttendees(event.id);
       setAttendees(attendees);
+      setEditingEvent(event);
       
     } catch (error) {
       console.error('Error updating event:', error);
@@ -83,7 +88,47 @@ const CalendarScreen = ({navigation}) => {
     }
     
   };
-
+  const removeUser = async (event) => {
+    
+    try {
+      await removeUserFromEvent(editingEvent.id, event);
+      const attendees= await getEventAttendees(editingEvent.id);
+      setAttendees(attendees);
+      
+    } catch (error) {
+      console.error('Error updating event:', error);
+    }finally{
+      setAttendanceModalVisible(true);
+    }
+    
+  };
+  const addUser =  async()=>{
+    
+    try {
+      
+      const users= await getAllUsers(editingEvent.id);
+      setAllUsers(users);
+      
+    } catch (error) {
+      console.error('Error updating event:', error);
+    }finally{
+      setAttendanceModalVisible(false);
+      setAddUserModalVisible(true);
+    }
+  }
+  const handleUserAdded =  async()=>{
+    
+    try {
+      const attendees= await getEventAttendees(editingEvent.id);
+      setAttendees(attendees);
+      
+    } catch (error) {
+      console.error('Error updating event:', error);
+    }finally{
+      setAttendanceModalVisible(true);
+      setAddUserModalVisible(false);
+    }
+  }
   const handleSave =async () => {
     try {
       await updateEvent(editingEvent.id, editingEvent);
@@ -142,8 +187,16 @@ const CalendarScreen = ({navigation}) => {
        <AttendanceGrid
         visible={attendanceModalVisible}
         onDismiss={() => setAttendanceModalVisible(false)}
-        attendees={attendees} // Pass the `attendance` array from the selected event
+        attendees={attendees} 
+        removeUser={removeUser}
+        addUser={addUser}
       />
+      <AddUserModal
+      visible={isAddUserModalVisible}
+      onClose={handleUserAdded}
+      eventId={editingEvent}
+      allUsers={allUsers}
+    />
     </View>
   );
 };

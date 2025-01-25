@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc,collection, setDoc, getDoc,getDocs, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 
 // Save or update user profile
@@ -27,5 +27,23 @@ export const getUserProfile = async (userId) => {
   } catch (error) {
     console.error('Error fetching user profile:', error);
     throw error;
+  }
+};
+
+export const getAllUsers = async () => {
+  try {
+    const usersRef = collection(db, 'users');
+    const querySnapshot = await getDocs(usersRef);
+
+    // Map through the documents and return an array of user objects
+    const users = querySnapshot.docs.map((doc) => ({
+      id: doc.id, // Include the document ID
+      ...doc.data(), // Spread the rest of the user data
+    }));
+
+    return users;
+  } catch (error) {
+    console.error('Error fetching all users:', error);
+    throw new Error('There was an error fetching the users');
   }
 };
