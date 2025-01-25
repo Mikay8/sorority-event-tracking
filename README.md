@@ -15,5 +15,5 @@ A React Native Expo app for tracking sorority events and attendance.
 ## How to Run
 1. Clone the repository.
 2. Install dependencies:
-   npm install
+   npm install // sudo npm install
    npm start

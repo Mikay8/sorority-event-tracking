@@ -1,6 +1,5 @@
 import { doc, updateDoc, collection, getDocs,getDoc, addDoc, deleteDoc, arrayRemove,arrayUnion} from 'firebase/firestore';
 import { getUserProfile } from './users';
-import firestore from '@react-native-firebase/firestore';
 import { db } from '../../firebase';
 import { format } from 'date-fns'
 
