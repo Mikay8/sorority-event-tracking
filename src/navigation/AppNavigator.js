@@ -26,7 +26,11 @@ if (Platform.OS==='ios'){
   return (
     <SafeAreaView style={styles.safeArea}>
       
-      {user ? <MainStack/> : <AuthStack />}
+      {user ? <MainStack/> : 
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <AuthStack />
+      </ScrollView>
+      }
       
     </SafeAreaView>
   );
