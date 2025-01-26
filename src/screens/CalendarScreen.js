@@ -149,9 +149,9 @@ const CalendarScreen = ({navigation}) => {
   );
   return (
     <View style={styles.container}>
-            <div style={{padding:'16px'}}>
+            <View style={{padding:'16px'}}>
               <Button title="Add Event" mode="contained" onPress={() => navigation.navigate('AddEventScreen')}>Add Event</Button>
-            </div>
+            </View>
       <Calendar
         markedDates={Object.keys(events).reduce((acc, date) => {
           acc[date] = { marked: true, dotColor: events[date].dotColor };

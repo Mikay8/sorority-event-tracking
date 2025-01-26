@@ -72,10 +72,10 @@ const AddEventScreen = () => {
         onDismiss={() => setShowDatePicker(false)}
         onConfirm={handleDateChange}
       />
-      <div style={{ padding:'16px'}}>
+      <View style={{ padding:'16px'}}>
         <Button title="Add Event" mode="contained" onPress={handleAddEvent}>Add Event</Button>
     
-      </div>
+      </View>
     </View>
   );
 };
