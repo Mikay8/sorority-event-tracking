@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Alert, Button } from 'react-native';
+import { View, StyleSheet, Text, Alert, Button, Platform } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
+import { BarCodeScanner } from 'expo-barcode-scanner';
 
 const EventScanScreen = ({ route }) => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -10,7 +11,9 @@ const EventScanScreen = ({ route }) => {
 
   useEffect(() => {
     (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
+      const { status } = await (Platform.OS === 'web'
+        ? BarCodeScanner.requestPermissionsAsync()
+        : Camera.requestCameraPermissionsAsync());
       setHasPermission(status === 'granted');
     })();
   }, []);
@@ -42,14 +45,22 @@ const EventScanScreen = ({ route }) => {
       <Text style={styles.title}>Event Details</Text>
       <Text style={styles.eventId}>Event ID: {event.title}</Text>
 
-      <Camera
-        style={styles.camera}
-        type={CameraType.back}
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        barCodeScannerSettings={{
-          barCodeTypes: ['qr'], // Only scan QR codes
-        }}
-      />
+      {Platform.OS === 'web' ? (
+        <BarCodeScanner
+          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          style={styles.camera}
+          barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]} // Only scan QR codes
+        />
+      ) : (
+        <Camera
+          style={styles.camera}
+          type={CameraType.back}
+          onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+          barCodeScannerSettings={{
+            barCodeTypes: [Camera.Constants.BarCodeType.qr], // Only scan QR codes
+          }}
+        />
+      )}
 
       {scanned && (
         <Button
