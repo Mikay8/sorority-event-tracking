@@ -22,9 +22,10 @@ const ScanForEventsScreen = ({ navigation }) => {
 
         // Filter upcoming events based on current date
         const currentDate = new Date();
-        const upcomingEvents = fetchedEvents.filter((event) =>
-          isAfter(stringToDate(event.date), currentDate)|| isEqual(stringToDate(event.date), currentDate)// Check if the event date is after the current date
-        );
+        const upcomingEvents = fetchedEvents.filter((event) => {
+          const eventDate = stringToDate(event.date);
+          return isAfter(eventDate, currentDate) || isEqual(eventDate.setHours(0, 0, 0, 0), currentDate.setHours(0, 0, 0, 0)); // Check if the event date is today or in the future, disregarding timestamps
+        }).sort((a, b) => stringToDate(a.date) - stringToDate(b.date)); // Sort events by date, closest to furthest
 
         setEvents(upcomingEvents);
       } catch (error) {

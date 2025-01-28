@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, Alert, Button, Platform,ActivityIndicator } from 'react-native';
+import { View, StyleSheet, Text, ActivityIndicator, Platform } from 'react-native';
+import {Alert, Button} from 'react-native-paper';
 import { Camera } from 'expo-camera';
 import { Html5QrcodeScanner } from 'html5-qrcode';
-import getUserProfile from '../services/firestore/users';
-import { set } from 'date-fns';
+import {getUserProfile} from '../services/firestore/users';
+import {addUserToEvent} from '../services/firestore/events';
+import { zh } from 'react-native-paper-dates';
 
 const EventScanScreen = ({ route }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [scannedData, setScannedData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { event } = route.params; // Get the event ID passed via navigation
+  const { event } = route.params;
 
   useEffect(() => {
     (async () => {
@@ -23,7 +25,7 @@ const EventScanScreen = ({ route }) => {
     if (Platform.OS === 'web' && hasPermission) {
       const scanner = new Html5QrcodeScanner(
         "reader",
-        { fps: 10, qrbox: 250 },
+        { fps: 10, qrbox: 300 }, // Increased QR box size
         false
       );
 
@@ -31,43 +33,45 @@ const EventScanScreen = ({ route }) => {
         (decodedText, decodedResult) => {
           setScanned(true);
           setScannedData(decodedText);
-          //Alert.alert('QR Code Scanned', `Data: ${decodedText}`);
         },
-        (errorMessage) => {
-         // console.log(`Error scanning = ${errorMessage}`);
-        }
+        // (errorMessage) => {
+        //   console.error(`Error scanning: ${errorMessage}`);
+        //   Alert.alert('Error', `QR code parse error: ${errorMessage}`);
+        // }
       );
 
       return () => {
-        scanner.clear();
+        scanner.clear().catch(error => console.error('Error clearing scanner:', error));
       };
     }
   }, [hasPermission]);
-  
-  useEffect(() => {
-      (async () => {
-        setLoading(true);
-      if (scannedData) {
-        // Get the user profile from Firestore
-        getUserProfile(scannedData)
-          .then((user) => {
-            consle.debug(user);
-            if (user) {
-              Alert.alert('User Found', `Name: ${user.name}`);
-            } else {
-              Alert.alert('User Not Found', 'No user found with this ID');
-            }
-          })
-          .catch((error) => {
-            console.error('Error getting user profile:', error);
-            Alert.alert('Error', 'There was an error getting the user profile');
-          }).finally(() => {
-            setLoading(false);
-          });
-      }
-    });
 
-  }, []);
+  useEffect(() => {
+    if (scannedData) {
+      setLoading(true);
+      getUserProfile(scannedData)
+        .then((user) => {
+          if (user) {
+            addUserToEvent(event.id, scannedData).then(() => {
+                alert(  ` ${user.displayName} Added to ` + event.title);
+            }).catch((error) => {
+                alert( error);
+            
+            });
+          }
+        })
+        .catch((error) => {
+          //console.error('Error getting user profile:', error);
+          alert(error);
+        })
+        .finally(() => {
+          setLoading(false);
+          setScanned(false);
+          setScannedData(null);
+        });
+    }
+  }, [scannedData]);
+
   if (hasPermission === null) {
     return (
       <View style={styles.container}>
@@ -83,40 +87,29 @@ const EventScanScreen = ({ route }) => {
       </View>
     );
   }
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#007bff" />
-      </View>
-    );
-  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Event Details</Text>
       <Text style={styles.eventId}>Event ID: {event.title}</Text>
-      {scannedData && (
-        <Text style={styles.scannedData}>Scanned Data: {scannedData}</Text>
-      )}
-
+      
       {Platform.OS === 'web' ? (
-        <div id="reader" style={styles.camera}></div>
+        <View >
+          <div id="reader" style={styles.camera}></div>
+          {loading && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color="#007bff" />
+              <Text style={styles.loaderText}>Loading your profile...</Text>
+            </View>
+          )}
+        </View>
       ) : (
         <Camera
           onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
           style={styles.camera}
-          barCodeTypes={[Camera.Constants.BarCodeType.qr]} // Only scan QR codes
+          barCodeTypes={[Camera.Constants.BarCodeType.qr]}
         />
       )}
-
-      {/* {scanned && (
-        <Button
-          title="Scan Again"
-          onPress={() => setScanned(false)}
-          color="#007bff"
-        />
-      )} */}
-
-      
     </View>
   );
 };
@@ -124,7 +117,6 @@ const EventScanScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
     backgroundColor: '#fff',
@@ -140,14 +132,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   camera: {
-    width: '50%',
-    height: 200, // Set a fixed height to prevent layout issues
-    marginBottom: 20,
+    width: '100%',
+    height: '100%',
   },
-  scannedData: {
-    marginTop: 16,
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Semi-transparent background
+  },
+  loaderText: {
+    marginTop: 10,
     fontSize: 16,
-    color: 'green',
+    color: '#6c757d',
   },
 });
 

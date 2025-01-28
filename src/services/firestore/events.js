@@ -117,7 +117,7 @@ import { format } from 'date-fns'
   
       const eventData = eventSnap.data();
       if (eventData.attendees && eventData.attendees.includes(userId)) {
-        console.log(`User ${userId} is already an attendee of event ${eventId}.`);
+        throw new Error(`User ${userId} is already an attendee of event ${eventId}.`);
         return; // Exit early if the user is already in the array
       }
   
@@ -128,7 +128,7 @@ import { format } from 'date-fns'
   
       console.log(`User ${userId} added to attendees list for event ${eventId}.`);
     } catch (error) {
-      console.error('Error adding user to attendees list:', error);
-      throw new Error('There was an error adding the user to the attendees list');
+      //console.error('Error adding user to attendees list:', error);
+      throw new Error(error);
     }
   };
