@@ -13,6 +13,7 @@ import UserQRScreen from '../screens/UserQRScreen'
 import { AuthContext } from '../context/AuthContext';
 import RightToolBar from '../components/RightToolBar';
 import { getUserProfile } from '../services/firestore/users';
+import UsersListScreen from '../screens/UsersListScreen';
 
 const Stack = createStackNavigator();
 
@@ -75,6 +76,7 @@ const AppNavigator = () => {
         <Stack.Screen name="ScanForEventsScreen" component={ScanForEventsScreen} options={{ title: 'Scan For Events Screen' }} />
         <Stack.Screen name="EventScanScreen" component={EventScanScreen} options={{title:'Scan Event'}}/>
         <Stack.Screen name="UserQRScreen" component={UserQRScreen} options={{title:'User QR Screen'}}/>
+        <Stack.Screen name="UsersListScreen" component={UsersListScreen} options={{title:'Users'}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

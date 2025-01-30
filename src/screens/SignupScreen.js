@@ -10,15 +10,16 @@ import { auth, db } from '../firebase';
 
 const SignupScreen = () => {
   const { setUser } = useContext(AuthContext);
-  const [email, setEmail] = useState('');
+  //const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [userId, setUserId] = useState('');
   const [fName, setFName] = useState('');
   const [lName, setLName] = useState('');
 
   const handleSignUp = async () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, `${userId}@sss.com`, password);
       const user = userCredential.user;
       // Update display name
       await updateProfile(user, { displayName: fName +" "+lName});
@@ -27,7 +28,8 @@ const SignupScreen = () => {
         displayName: fName+' '+lName,
         firstName:fName,
         lastName:lName,
-        email: email,
+        email: `${userId}@sss.com`,
+        accountId: userId,
         role: 'user', // Default role
         photoURL: '', // Placeholder for profile photo
       });
@@ -55,12 +57,16 @@ const SignupScreen = () => {
       />
       
       <TextInputWrapper
-        label={"Email"}
+        label={"ID"}
+        value={userId}
+        onChangeText={setUserId}
+        type="required" // Triggers password validation
+      />
+              {/* label={"Email"}
         value={email}
         onChangeText={setEmail}
-        type="email" // Triggers password validation
-      />
-      
+        type="email" // Triggers password validation */}
+
       <TextInputWrapper
         label={"Password"}
         value={password}

@@ -8,13 +8,14 @@ import TextInputWrapper from '../components/TextInputWrapper';
 
 const LoginScreen = () => {
   const { setUser } = useContext(AuthContext);
-  const [email, setEmail] = useState('');
+  const [userId, setUserId] = useState('');
+  //const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleLogin = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, `${userId}@sss.com`, password);
       setUser(userCredential.user); // Store user in contex
     } catch (err) {
       setError(err.message);
@@ -25,11 +26,17 @@ const LoginScreen = () => {
     <View style={styles.container}>
       
       <TextInputWrapper
-        label={"Email"}
+        label={"ID"}
+        value={userId}
+        onChangeText={setUserId}
+        type="required" // Triggers password validation
+      />
+      {/* <TextInputWrapper
+        label={email}
         value={email}
         onChangeText={setEmail}
-        type="email" // Triggers password validation
-      />
+        type="email" // Triggers email validation
+      /> */}
       
       <TextInputWrapper
         label={"Password"}
