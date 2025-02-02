@@ -21,7 +21,6 @@ const AppNavigator = () => {
   const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   //const [displayName, setDisplayName] = useState('');
-  const [userData, setUserData] = useState(null);
 
   const handleLogout = async () => {
     try {
@@ -51,15 +50,6 @@ const AppNavigator = () => {
     fetchUser();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#007bff" />
-        <Text style={styles.loaderText}>Loading your profile...</Text>
-      </View>
-    );
-  }
-
   return (
     
     <NavigationContainer>
@@ -67,7 +57,7 @@ const AppNavigator = () => {
         <Stack.Screen name="HomeScreen" component={HomeScreen} options={
           { title: 'Home', 
             headerRight: () => (
-            <RightToolBar displayName={userData.displayName} logout={handleLogout} />
+            <RightToolBar displayName={user.displayName} logout={handleLogout} />
           ), }
           } />
         <Stack.Screen name="CalendarScreen" component={CalendarScreen} options={{ title: 'Calendar',   

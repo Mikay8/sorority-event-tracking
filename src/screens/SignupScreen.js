@@ -5,11 +5,11 @@ import { AuthContext } from '../context/AuthContext';
 import { createUserWithEmailAndPassword,updateProfile } from 'firebase/auth';
 import TextInputWrapper from '../components/TextInputWrapper';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { saveUserProfile } from '../services/firestore/users';
+import { saveUserProfile,searchUsersByField,deleteUser } from '../services/firestore/users';
 import { auth, db } from '../firebase';
 
 const SignupScreen = () => {
-  const { setUser } = useContext(AuthContext);
+  const { setUser, signUp,updateUserProfile} = useContext(AuthContext);
   //const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,21 +19,48 @@ const SignupScreen = () => {
 
   const handleSignUp = async () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, `${userId}@sss.com`, password);
-      const user = userCredential.user;
+      //const userCredential = await createUserWithEmailAndPassword(auth, `${userId}@sss.com`, password);
+      //const user = userCredential.user;
+      const user= await signUp(`${userId}@sss.com`, password, fName+' '+lName);
       // Update display name
-      await updateProfile(user, { displayName: fName +" "+lName});
+      //await updateUserProfile(user, { displayName: fName +" "+lName});
+      //await updateProfile(user, { displayName: fName +" "+lName});
        // Save user profile to Firestore
-       await saveUserProfile(user.uid, {
-        displayName: fName+' '+lName,
-        firstName:fName,
-        lastName:lName,
-        email: `${userId}@sss.com`,
-        accountId: userId,
-        role: 'user', // Default role
-        photoURL: '', // Placeholder for profile photo
-      });
-      setUser(userCredential.user); 
+      const userExists = await searchUsersByField('accountId', userId);
+       if (userExists.length > 0) {
+        
+        deleteUser(userExists[0].id);
+        
+        delete userExists[0].id;
+
+        await saveUserProfile(user.uid, {
+          ...userExists[0],
+          displayName: fName+' '+lName,
+          firstName:fName,
+          lastName:lName,
+          email: `${userId}@sss.com`,
+          accountId: userId,
+          role: 'user', // Default role
+          photoURL: '', // Placeholder for profile photo
+          createdAt: serverTimestamp(),
+        });
+        
+      }else{
+
+        await saveUserProfile(user.uid, {
+          displayName: fName+' '+lName,
+          firstName:fName,
+          lastName:lName,
+          email: `${userId}@sss.com`,
+          accountId: userId,
+          role: 'user', // Default role
+          photoURL: '', // Placeholder for profile photo
+          createdAt: serverTimestamp(),
+        });
+      }
+       
+      //setUser(userCredential.user); 
+
     } catch (err) {
       setError(err.message);
     }

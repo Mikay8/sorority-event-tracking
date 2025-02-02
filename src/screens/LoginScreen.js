@@ -1,13 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
-import { signInWithEmailAndPassword, getAuth } from 'firebase/auth';
-import { auth } from '../firebase';
 import { AuthContext } from '../context/AuthContext';
 import TextInputWrapper from '../components/TextInputWrapper';
 
 const LoginScreen = () => {
-  const { setUser } = useContext(AuthContext);
+  const { setUser,signIn } = useContext(AuthContext);
   const [userId, setUserId] = useState('');
   //const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,8 +13,7 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, `${userId}@sss.com`, password);
-      setUser(userCredential.user); // Store user in contex
+      signIn(`${userId}@sss.com`, password)
     } catch (err) {
       setError(err.message);
     }

@@ -1,13 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { Button, Text } from 'react-native-paper';
 import { auth } from '../firebase';
+import {getUserProfile} from '../services/firestore/users';
 import { AuthContext } from '../context/AuthContext';
 
 
 const HomeScreen = ({ navigation }) => {
-  const { user, setUser } = useContext(AuthContext); // Get the user from the context
+  const { user } = useContext(AuthContext); // Get the user from the context
   return (
     <View style={styles.container}>
       <Text variant="displayMedium">
