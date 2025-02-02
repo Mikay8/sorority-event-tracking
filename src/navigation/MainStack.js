@@ -25,7 +25,7 @@ const AppNavigator = () => {
   const handleLogout = async () => {
     try {
       await auth.signOut(); // Sign out the user
-      setUser(null);
+      //setUser(null);
     } catch (error) {
       console.error('Error logging out:', error.message);
     }
@@ -38,7 +38,7 @@ const AppNavigator = () => {
           await auth.currentUser.reload();
           const profile = await getUserProfile(auth.currentUser.uid);
           //setDisplayName(profile.displayName || 'User'); // Default to 'User' if no displayName exists
-          setUserData(profile)
+          //setUserData(profile)
         }
       } catch (error) {
         console.error('Error fetching user:', error);

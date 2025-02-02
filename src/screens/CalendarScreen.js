@@ -51,7 +51,7 @@ const CalendarScreen = ({navigation}) => {
   
       fetchEvents();
     
-    }, [isModalVisible==false])
+    }, [editingEvent==null || navigation])
   );
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);

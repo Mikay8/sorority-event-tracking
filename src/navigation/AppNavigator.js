@@ -23,7 +23,7 @@ const AppNavigator = () => {
     return (
                 <View style={styles.loadingOverlay}>
                   <ActivityIndicator size="large" color="#007bff" />
-                  <Text style={styles.loaderText}>Loading your profile...</Text>
+                  <Text >Loading your profile...</Text>
                 </View>
                 );
   }
@@ -58,14 +58,8 @@ const styles = StyleSheet.create({
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  loaderText: {
-    fontSize: 16,
-    color: '#fff',
-    marginTop: 10,
   },
   
 });

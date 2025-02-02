@@ -3,6 +3,7 @@ import { View, StyleSheet, FlatList } from 'react-native';
 import { Card, Text, Button, ActivityIndicator } from 'react-native-paper';
 import { getEvents } from '../services/firestore/events'; // Ensure this points to the correct file
 import { format, isAfter,isEqual } from 'date-fns'; // Install with `npm install date-fns`
+import { utcToZonedTime } from 'date-fns-tz';
 
 const ScanForEventsScreen = ({ navigation }) => {
   const [events, setEvents] = useState([]);
@@ -22,10 +23,18 @@ const ScanForEventsScreen = ({ navigation }) => {
 
         // Filter upcoming events based on current date
         const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() - 1);
         const upcomingEvents = fetchedEvents.filter((event) => {
-          const eventDate = stringToDate(event.date);
-          return isAfter(eventDate, currentDate) || isEqual(eventDate.setHours(0, 0, 0, 0), currentDate.setHours(0, 0, 0, 0)); // Check if the event date is today or in the future, disregarding timestamps
-        }).sort((a, b) => stringToDate(a.date) - stringToDate(b.date)); // Sort events by date, closest to furthest
+          const eventDate = new Date(...event.date.split('-')
+          .map((val, index) => 
+            index === 1 ? Number(val) - 1 : Number(val)
+          ));
+          return isAfter(eventDate, currentDate); 
+        })
+        .sort((a, b) => 
+          stringToDate(a.date) - stringToDate(b.date
+
+          )); 
 
         setEvents(upcomingEvents);
       } catch (error) {
@@ -39,21 +48,23 @@ const ScanForEventsScreen = ({ navigation }) => {
   }, []);
 
   // Render each event card
-  const renderEventCard = ({ item }) => (
-    <Card style={styles.eventCard}>
-      <Card.Content>
-        <Text style={styles.title}>Title: {item.title}</Text>
-        <Text style={styles.description}>Description: {item.description}</Text>
-        <Text style={styles.location}>Location: {item.location}</Text>
-        <Text style={styles.date}>Date: {format(new Date(item.date), 'MMMM dd, yyyy')}</Text>
-      </Card.Content>
-      <Card.Actions>
-        <Button onPress={() => navigation.navigate('EventScanScreen', { event: item })}>
-          Scan
-        </Button>
-      </Card.Actions>
-    </Card>
-  );
+  const renderEventCard = ({ item }) => {
+    return (
+      <Card style={styles.eventCard}>
+        <Card.Content>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.description}>Description: {item.description}</Text>
+          <Text style={styles.location}>Location: {item.location}</Text>
+          <Text style={styles.date}>Date: {format(stringToDate(item.date), 'dd-MM-yyyy')}</Text>
+        </Card.Content>
+        <Card.Actions>
+          <Button onPress={() => navigation.navigate('EventScanScreen', { event: item })}>
+            Scan
+          </Button>
+        </Card.Actions>
+      </Card>
+    );
+  };
 
   return (
     <View style={styles.container}>
