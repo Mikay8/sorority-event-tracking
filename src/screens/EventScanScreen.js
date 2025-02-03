@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator, Platform } from 'react-native';
 import ActivityIndicatorWrapper from '../components/ActivityIndicatorWrapper';
-import {Alert, Button} from 'react-native-paper';
 import { Camera } from 'expo-camera';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import {getUserProfile} from '../services/firestore/users';
 import {addUserToEvent} from '../services/firestore/events';
-import { zh } from 'react-native-paper-dates';
 
 const EventScanScreen = ({ route }) => {
   const [hasPermission, setHasPermission] = useState(null);

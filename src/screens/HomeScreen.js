@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Button, Text } from 'react-native-paper';
+import ButtonWrapper from '../components/ButtonWrapper';
 import { auth } from '../firebase';
 import {getUserProfile} from '../services/firestore/users';
 import { AuthContext } from '../context/AuthContext';
@@ -19,18 +20,14 @@ const HomeScreen = ({ navigation }) => {
       >
      
       </TouchableOpacity>
-      <Button mode="contained" onPress={() => navigation.navigate('CalendarScreen')}>
-        Go to Calendar
-      </Button>
-      <Button mode="contained" onPress={() => navigation.navigate('ScanForEventsScreen')}>
-         Scan For Events Screen
-      </Button>
-      <Button mode="contained" onPress={() => navigation.navigate('UserQRScreen')}>
-        User QR Screen
-      </Button>
-      <Button mode="contained" onPress={() => navigation.navigate('UsersListScreen')}>
-        Users List Screen
-      </Button>
+      
+      <ButtonWrapper title="Go to Calendar" onPress={() => navigation.navigate('CalendarScreen')}></ButtonWrapper>
+      
+      <ButtonWrapper title="Scan For Events Screen" onPress={() => navigation.navigate('ScanForEventsScreen')}></ButtonWrapper>
+      
+      <ButtonWrapper title="User QR Screen" onPress={() => navigation.navigate('UserQRScreen')}></ButtonWrapper>
+      
+      <ButtonWrapper title="Users List Screen" onPress={() => navigation.navigate('UsersListScreen')}></ButtonWrapper>
       <Text style={styles.info}>You are logged in as {user?.accountId}</Text>
       
     </View>

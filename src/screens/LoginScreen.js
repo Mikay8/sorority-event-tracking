@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
+import ButtonWrapper from '../components/ButtonWrapper';
 import { AuthContext } from '../context/AuthContext';
 import TextInputWrapper from '../components/TextInputWrapper';
 
@@ -43,9 +44,8 @@ const LoginScreen = () => {
         secureTextEntry
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button mode="contained" onPress={handleLogin}>
-        Log In
-      </Button>
+      
+      <ButtonWrapper title="Log In" onPress={handleLogin} />
     </View>
   );
 };

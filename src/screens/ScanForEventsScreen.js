@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
-import { Card, Text, Button } from 'react-native-paper';
+import { Card, Text } from 'react-native-paper';
+import ButtonWrapper from '../components/ButtonWrapper';
 import ActivityIndicatorWrapper from '../components/ActivityIndicatorWrapper';
 import { getEvents } from '../services/firestore/events'; // Ensure this points to the correct file
 import { format, isAfter,isEqual } from 'date-fns'; // Install with `npm install date-fns`
@@ -59,9 +60,7 @@ const ScanForEventsScreen = ({ navigation }) => {
           <Text style={styles.date}>Date: {format(stringToDate(item.date), 'dd-MM-yyyy')}</Text>
         </Card.Content>
         <Card.Actions>
-          <Button onPress={() => navigation.navigate('EventScanScreen', { event: item })}>
-            Scan
-          </Button>
+          <ButtonWrapper title="Scan" onPress={() => navigation.navigate('EventScanScreen', { event: item })}/>
         </Card.Actions>
       </Card>
     );

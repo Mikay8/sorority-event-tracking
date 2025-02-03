@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
-import {  Button, } from 'react-native-paper';
 import TextInputWrapper from '../components/TextInputWrapper';
+import ButtonWrapper from '../components/ButtonWrapper';
 import { DatePickerModal } from 'react-native-paper-dates';
 import { useNavigation } from '@react-navigation/native';
 import { addEvent } from '../services/firestore/events'; // Import addEvent function
@@ -72,10 +72,7 @@ const AddEventScreen = () => {
         onDismiss={() => setShowDatePicker(false)}
         onConfirm={handleDateChange}
       />
-      <View style={{ padding:'16px'}}>
-        <Button title="Add Event" mode="contained" onPress={handleAddEvent}>Add Event</Button>
-    
-      </View>
+      <ButtonWrapper title="Add Event" onPress={handleAddEvent}></ButtonWrapper>
     </View>
   );
 };

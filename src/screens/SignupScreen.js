@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
+import ButtonWrapper from '../components/ButtonWrapper';
 import { AuthContext } from '../context/AuthContext';
 import TextInputWrapper from '../components/TextInputWrapper';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -92,9 +93,8 @@ const SignupScreen = () => {
         type="password" // Triggers password validation
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button mode="contained" onPress={handleSignUp}>
-        Sign Up
-      </Button>
+      
+      <ButtonWrapper title="Sign Up" onPress={handleSignUp} />
     </View>
   );
 };

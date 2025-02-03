@@ -1,7 +1,8 @@
 import React, { useEffect, useState,useCallback } from 'react';
 import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import {  Button, Text, Card } from 'react-native-paper';
+import { Text, Card } from 'react-native-paper';
+import ButtonWrapper from '../components/ButtonWrapper';
 import { Calendar } from 'react-native-calendars';
 import { getAllUsers } from '../services/firestore/users';
 import { getEvents,updateEvent,deleteEvent,getEventAttendees, removeUserFromEvent } from '../services/firestore/events';
@@ -149,9 +150,7 @@ const CalendarScreen = ({navigation}) => {
   );
   return (
     <View style={styles.container}>
-            <View style={{padding:'16px'}}>
-              <Button title="Add Event" mode="contained" onPress={() => navigation.navigate('AddEventScreen')}>Add Event</Button>
-            </View>
+            <ButtonWrapper title="Add Event" onPress={() => navigation.navigate('AddEventScreen')}></ButtonWrapper>
       <Calendar
         markedDates={Object.keys(events).reduce((acc, date) => {
           acc[date] = { marked: true, dotColor: events[date].dotColor };
