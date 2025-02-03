@@ -2,11 +2,9 @@ import React, { useState, useContext } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { AuthContext } from '../context/AuthContext';
-import { createUserWithEmailAndPassword,updateProfile } from 'firebase/auth';
 import TextInputWrapper from '../components/TextInputWrapper';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { saveUserProfile,searchUsersByField,deleteUser } from '../services/firestore/users';
-import { auth, db } from '../firebase';
 
 const SignupScreen = () => {
   const { setUser, signUp,updateUserProfile} = useContext(AuthContext);
@@ -19,20 +17,12 @@ const SignupScreen = () => {
 
   const handleSignUp = async () => {
     try {
-      //const userCredential = await createUserWithEmailAndPassword(auth, `${userId}@sss.com`, password);
-      //const user = userCredential.user;
       const user= await signUp(`${userId}@sss.com`, password, fName+' '+lName);
-      // Update display name
-      //await updateUserProfile(user, { displayName: fName +" "+lName});
-      //await updateProfile(user, { displayName: fName +" "+lName});
        // Save user profile to Firestore
       const userExists = await searchUsersByField('accountId', userId);
        if (userExists.length > 0) {
-        
         deleteUser(userExists[0].id);
-        
         delete userExists[0].id;
-
         await saveUserProfile(user.uid, {
           ...userExists[0],
           displayName: fName+' '+lName,

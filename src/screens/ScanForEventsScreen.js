@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
-import { Card, Text, Button, ActivityIndicator } from 'react-native-paper';
+import { Card, Text, Button } from 'react-native-paper';
+import ActivityIndicatorWrapper from '../components/ActivityIndicatorWrapper';
 import { getEvents } from '../services/firestore/events'; // Ensure this points to the correct file
 import { format, isAfter,isEqual } from 'date-fns'; // Install with `npm install date-fns`
 import { utcToZonedTime } from 'date-fns-tz';
@@ -69,7 +70,7 @@ const ScanForEventsScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       {loading ? (
-        <ActivityIndicator animating={true} size="large" />
+        <ActivityIndicatorWrapper text ={ "Loading events..."}/>
       ) : events.length > 0 ? (
         <FlatList
           data={events}

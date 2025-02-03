@@ -7,13 +7,13 @@ import {
   ScrollView,
   SafeAreaView,
   Dimensions,
-  Platform,
-  ActivityIndicator
+  Platform
 } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 import AuthStack from './AuthStack';
 import MainStack from './MainStack'; 
 import { AuthContext } from '../context/AuthContext';
+import ActivityIndicatorWrapper from '../components/ActivityIndicatorWrapper';
 import theme from '../themes/lightColors'
 
 const AppNavigator = () => {
@@ -21,10 +21,7 @@ const AppNavigator = () => {
   
   if (loading) { 
     return (
-                <View style={styles.loadingOverlay}>
-                  <ActivityIndicator size="large" color="#007bff" />
-                  <Text >Loading your profile...</Text>
-                </View>
+                  <ActivityIndicatorWrapper text={"Loading your profile..."}/>
                 );
   }
 if (Platform.OS==='ios'){

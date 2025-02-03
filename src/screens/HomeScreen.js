@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { auth } from '../firebase';
 import {getUserProfile} from '../services/firestore/users';

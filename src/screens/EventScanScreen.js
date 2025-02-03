@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator, Platform } from 'react-native';
+import ActivityIndicatorWrapper from '../components/ActivityIndicatorWrapper';
 import {Alert, Button} from 'react-native-paper';
 import { Camera } from 'expo-camera';
 import { Html5QrcodeScanner } from 'html5-qrcode';
@@ -97,10 +98,7 @@ const EventScanScreen = ({ route }) => {
         <View >
           <div id="reader" style={styles.camera}></div>
           {loading && (
-            <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color="#007bff" />
-              <Text style={styles.loaderText}>Loading your profile...</Text>
-            </View>
+            <ActivityIndicatorWrapper text={"Loading scanner..."}/>
           )}
         </View>
       ) : (
