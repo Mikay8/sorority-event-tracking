@@ -73,9 +73,9 @@ const AppNavigator = () => {
 };
 const HeaderRight = ({ displayName, logout }) => (
   <div style={{ marginRight: 10 }}>
-    <Button mode="contained" onPress={logout}>
+    
         {displayName}
-    </Button>
+    
   </div>
 );
 const styles = StyleSheet.create({

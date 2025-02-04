@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, FlatList,ScrollView } from 'react-native';
-import { Modal, Text, TextInput, Button, Card, Checkbox } from 'react-native-paper';
+import { Modal, Text, TextInput, Card, Checkbox } from 'react-native-paper';
+import ButtonWrapper from './ButtonWrapper';
 import { addUserToEvent } from '../services/firestore/events'; // Function to add user to event
 
 const AddUserModal = ({ visible, onClose, eventId, allUsers }) => {
@@ -70,17 +71,10 @@ const AddUserModal = ({ visible, onClose, eventId, allUsers }) => {
       </ScrollView>
       
       <View style={styles.actions}>
-        <Button onPress={onClose} mode="outlined" style={styles.cancelButton}>
-          Cancel
-        </Button>
-        <Button
-          onPress={handleAddUser}
-          mode="contained"
-          loading={loading}
-          disabled={!selectedUser || loading}
-        >
-          Add User
-        </Button>
+        
+        <ButtonWrapper title={"Cancel"} onPress={onClose} />
+        <ButtonWrapper title="Add User" onPress={handleAddUser} loading={loading} disabled={!selectedUser || loading} />
+        
       </View>
     </Modal>
   );
@@ -138,10 +132,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 16,
-  },
-  cancelButton: {
-    marginRight: 8,
-  },
+  }
 });
 
 export default AddUserModal;

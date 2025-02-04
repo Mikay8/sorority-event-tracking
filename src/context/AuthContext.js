@@ -2,12 +2,15 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../firebase';
+import ErrorModal from '../components/ErrorModal';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [errorMes, setErrorMes] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -18,20 +21,6 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe; // Cleanup on unmount
   }, []);
 
-  const updateUserProfile = async (user, profileUpdates) => {
-    if (user) {
-      //setLoading(true);
-      try {
-    
-        await updateProfile(user, profileUpdates);
-        setUser({ ...user, ...profileUpdates });
-      } catch (err) {
-        console.error(err.message);
-      }finally{
-        setLoading(false);
-      }
-    }
-  };
 
   const signIn = async (email, password) => {
     try {
@@ -39,34 +28,36 @@ export const AuthProvider = ({ children }) => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       setUser(userCredential.user);
     } catch (err) {
-      console.error(err.message);
+        setErrorMes(err.message);
+        setModalVisible(true);
     } finally {
       setLoading(false);
     }
   };
 
   const signUp = async ( email, password, displayName) => {
+    const currentError = '';
     try {
-      
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       setLoading(true);
       try {
         await updateProfile(userCredential.user, {displayName: displayName });
         setUser({...userCredential.user, displayName: displayName });
       } catch (err) {
-        console.error(err.message);
+        currentError+=err.message+'\n';
       }finally{
         setLoading(false);
         return userCredential.user;
       }
-      
     } catch (err) {
-      console.error(err.message);
+        setErrorMes(currentError + err);
+        setModalVisible(true);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp,updateUserProfile, setUser }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, setUser }}>
+      <ErrorModal modalVisible={modalVisible} setModalVisible={setModalVisible} errorMes={errorMes} />
       {children}
     </AuthContext.Provider>
   );

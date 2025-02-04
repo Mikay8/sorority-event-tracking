@@ -1,7 +1,8 @@
 import React from 'react';
 import { Modal, StyleSheet, View } from 'react-native';
 import TextInputWrapper from '../components/TextInputWrapper';
-import { Card, TextInput, Button, Text } from 'react-native-paper';
+import { Card, TextInput, Text } from 'react-native-paper';
+import ButtonWrapper from './ButtonWrapper';
 import { useTheme } from 'react-native-paper';
 const EditEventModal = ({
   visible,
@@ -16,7 +17,6 @@ const EditEventModal = ({
     <Modal
       visible={visible}
       transparent={true}
-      
       onRequestClose={onClose}
     >
       <View style={styles.modalContainer}>
@@ -45,15 +45,11 @@ const EditEventModal = ({
               }
               style={styles.input}
             />
-            <Button mode="contained" onPress={onSave} style={styles.saveButton}>
-              Save
-            </Button>
-            <Button mode="contained" onPress={onDelete} style={styles.cancelButton}buttonColor={theme.colors.error}>
-              Delete
-            </Button>
-            <Button onPress={onClose} style={styles.cancelButton}>
-              Cancel
-            </Button>
+            <View style={styles.buttonContainer}>
+              <ButtonWrapper title="Save" onPress={onSave} />
+              <ButtonWrapper title="Delete" onPress={onDelete} buttonColor={theme.colors.error} />
+              <ButtonWrapper title="Cancel" onPress={onClose} buttonColor={theme.colors.secondary} />
+            </View>
           </Card.Content>
         </Card>
       </View>
@@ -82,9 +78,10 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 16,
   },
-  saveButton: {
-    marginBottom: 10,
-  },
+  buttonContainer: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  }
 });
 
 export default EditEventModal;

@@ -1,16 +1,15 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
+import {  Text } from 'react-native-paper';
+import ButtonWrapper from './ButtonWrapper';
 const RightToolBar = ({ displayName, logout }) => {
   return (
     <View style={styles.headerRightContainer}>
       {/* Display Name */}
       <Text style={styles.displayName}>{displayName}</Text>
 
-      {/* Logout Button */}
-      <Button  onPress={logout}>
-        Log Out
-    </Button>
+      <ButtonWrapper title={'Log Out'}  onPress={logout}/>
+        
     </View>
   );
 };

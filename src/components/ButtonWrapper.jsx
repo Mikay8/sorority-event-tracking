@@ -2,10 +2,10 @@ import React from 'react';
 import { Button } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
 
-const ButtonWrapper = ({ onPress, title, style }) => {
+const ButtonWrapper = ({ onPress, title, style,buttonColor, ...props }) => {
     return (
-        <View style={[styles.buttonContainer, style]}>
-            <Button title={title} mode="contained" onPress={onPress}>
+        <View style={[styles.buttonContainer, style]} {...props}>
+            <Button title={title} mode="contained" onPress={onPress} buttonColor={buttonColor}>
                 {title}
             </Button>
         </View>

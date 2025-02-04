@@ -8,7 +8,7 @@ import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { saveUserProfile,searchUsersByField,deleteUser } from '../services/firestore/users';
 
 const SignupScreen = () => {
-  const { setUser, signUp,updateUserProfile} = useContext(AuthContext);
+  const { setUser, signUp} = useContext(AuthContext);
   //const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -92,7 +92,7 @@ const SignupScreen = () => {
         secureTextEntry
         type="password" // Triggers password validation
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      
       
       <ButtonWrapper title="Sign Up" onPress={handleSignUp} />
     </View>
