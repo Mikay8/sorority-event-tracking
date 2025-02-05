@@ -1,37 +1,57 @@
 import React, { useState, useContext } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
+import ButtonWrapper from '../components/ButtonWrapper';
 import { AuthContext } from '../context/AuthContext';
-import { createUserWithEmailAndPassword,updateProfile } from 'firebase/auth';
 import TextInputWrapper from '../components/TextInputWrapper';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { saveUserProfile } from '../services/firestore/users';
-import { auth, db } from '../firebase';
+import { saveUserProfile,searchUsersByField,deleteUser } from '../services/firestore/users';
 
 const SignupScreen = () => {
-  const { setUser } = useContext(AuthContext);
-  const [email, setEmail] = useState('');
+  const { setUser, signUp} = useContext(AuthContext);
+  //const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [userId, setUserId] = useState('');
   const [fName, setFName] = useState('');
   const [lName, setLName] = useState('');
 
   const handleSignUp = async () => {
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      // Update display name
-      await updateProfile(user, { displayName: fName +" "+lName});
+      const user= await signUp(`${userId}@sss.com`, password, fName+' '+lName);
        // Save user profile to Firestore
-       await saveUserProfile(user.uid, {
-        displayName: fName+' '+lName,
-        firstName:fName,
-        lastName:lName,
-        email: email,
-        role: 'user', // Default role
-        photoURL: '', // Placeholder for profile photo
-      });
-      setUser(userCredential.user); 
+      const userExists = await searchUsersByField('accountId', userId);
+       if (userExists.length > 0) {
+        deleteUser(userExists[0].id);
+        delete userExists[0].id;
+        await saveUserProfile(user.uid, {
+          ...userExists[0],
+          displayName: fName+' '+lName,
+          firstName:fName,
+          lastName:lName,
+          email: `${userId}@sss.com`,
+          accountId: userId,
+          role: 'user', // Default role
+          photoURL: '', // Placeholder for profile photo
+          createdAt: serverTimestamp(),
+        });
+        
+      }else{
+
+        await saveUserProfile(user.uid, {
+          displayName: fName+' '+lName,
+          firstName:fName,
+          lastName:lName,
+          email: `${userId}@sss.com`,
+          accountId: userId,
+          role: 'user', // Default role
+          photoURL: '', // Placeholder for profile photo
+          createdAt: serverTimestamp(),
+        });
+      }
+       
+      //setUser(userCredential.user); 
+
     } catch (err) {
       setError(err.message);
     }
@@ -55,12 +75,16 @@ const SignupScreen = () => {
       />
       
       <TextInputWrapper
-        label={"Email"}
+        label={"ID"}
+        value={userId}
+        onChangeText={setUserId}
+        type="required" // Triggers password validation
+      />
+              {/* label={"Email"}
         value={email}
         onChangeText={setEmail}
-        type="email" // Triggers password validation
-      />
-      
+        type="email" // Triggers password validation */}
+
       <TextInputWrapper
         label={"Password"}
         value={password}
@@ -68,10 +92,9 @@ const SignupScreen = () => {
         secureTextEntry
         type="password" // Triggers password validation
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button mode="contained" onPress={handleSignUp}>
-        Sign Up
-      </Button>
+      
+      
+      <ButtonWrapper title="Sign Up" onPress={handleSignUp} />
     </View>
   );
 };

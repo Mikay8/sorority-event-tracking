@@ -1,4 +1,4 @@
-import { doc,collection, setDoc, getDoc,getDocs, serverTimestamp } from 'firebase/firestore';
+import { doc,collection, setDoc, getDoc,getDocs,deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../firebase';
 
 // Save or update user profile
@@ -47,3 +47,29 @@ export const getAllUsers = async () => {
     throw new Error('There was an error fetching the users');
   }
 };
+
+  // Search users by a specific field
+  export const searchUsersByField = async (field, value) => {
+    try {
+      const usersRef = collection(db, 'users');
+      const querySnapshot = await getDocs(usersRef);
+      const users = querySnapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((user) => user[field] === value);
+
+      return users;
+    } catch (error) {
+      console.error(`Error searching users by ${field}:`, error);
+      throw new Error(`There was an error searching users by ${field}`);
+    }
+  };
+  export const deleteUser = async (userId) => {
+    try {
+      const userRef = doc(db, 'users', userId);
+      await deleteDoc(userRef);
+      console.log('User deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      throw new Error('There was an error deleting the user');
+    }
+  };

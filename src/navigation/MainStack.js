@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -9,9 +9,11 @@ import CalendarScreen from '../screens/CalendarScreen';
 import ScanForEventsScreen from '../screens/ScanForEventsScreen';
 import EventScanScreen from '../screens/EventScanScreen'
 import AddEventScreen from '../screens/AddEventScreen'
+import UserQRScreen from '../screens/UserQRScreen'
 import { AuthContext } from '../context/AuthContext';
 import RightToolBar from '../components/RightToolBar';
 import { getUserProfile } from '../services/firestore/users';
+import UsersListScreen from '../screens/UsersListScreen';
 
 const Stack = createStackNavigator();
 
@@ -19,12 +21,11 @@ const AppNavigator = () => {
   const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   //const [displayName, setDisplayName] = useState('');
-  const [userData, setUserData] = useState(null);
 
   const handleLogout = async () => {
     try {
       await auth.signOut(); // Sign out the user
-      setUser(null);
+      //setUser(null);
     } catch (error) {
       console.error('Error logging out:', error.message);
     }
@@ -37,7 +38,7 @@ const AppNavigator = () => {
           await auth.currentUser.reload();
           const profile = await getUserProfile(auth.currentUser.uid);
           //setDisplayName(profile.displayName || 'User'); // Default to 'User' if no displayName exists
-          setUserData(profile)
+          //setUserData(profile)
         }
       } catch (error) {
         console.error('Error fetching user:', error);
@@ -49,15 +50,6 @@ const AppNavigator = () => {
     fetchUser();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#007bff" />
-        <Text style={styles.loaderText}>Loading your profile...</Text>
-      </View>
-    );
-  }
-
   return (
     
     <NavigationContainer>
@@ -65,7 +57,7 @@ const AppNavigator = () => {
         <Stack.Screen name="HomeScreen" component={HomeScreen} options={
           { title: 'Home', 
             headerRight: () => (
-            <RightToolBar displayName={userData.displayName} logout={handleLogout} />
+            <RightToolBar displayName={user.displayName} logout={handleLogout} />
           ), }
           } />
         <Stack.Screen name="CalendarScreen" component={CalendarScreen} options={{ title: 'Calendar',   
@@ -73,15 +65,17 @@ const AppNavigator = () => {
         <Stack.Screen name="AddEventScreen" component={AddEventScreen} options={{ title: 'Add Event' }} />
         <Stack.Screen name="ScanForEventsScreen" component={ScanForEventsScreen} options={{ title: 'Scan For Events Screen' }} />
         <Stack.Screen name="EventScanScreen" component={EventScanScreen} options={{title:'Scan Event'}}/>
+        <Stack.Screen name="UserQRScreen" component={UserQRScreen} options={{title:'User QR Screen'}}/>
+        <Stack.Screen name="UsersListScreen" component={UsersListScreen} options={{title:'Users'}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 const HeaderRight = ({ displayName, logout }) => (
   <div style={{ marginRight: 10 }}>
-    <Button mode="contained" onPress={logout}>
+    
         {displayName}
-    </Button>
+    
   </div>
 );
 const styles = StyleSheet.create({

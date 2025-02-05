@@ -1,7 +1,8 @@
 import React, { useEffect, useState,useCallback } from 'react';
-import { View, StyleSheet, ScrollView, FlatList } from 'react-native';
+import { View, StyleSheet, ScrollView, FlatList,Dimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import {  Button, Text, Card } from 'react-native-paper';
+import { Text, Card } from 'react-native-paper';
+import ButtonWrapper from '../components/ButtonWrapper';
 import { Calendar } from 'react-native-calendars';
 import { getAllUsers } from '../services/firestore/users';
 import { getEvents,updateEvent,deleteEvent,getEventAttendees, removeUserFromEvent } from '../services/firestore/events';
@@ -11,7 +12,7 @@ import EventCard from '../components/EventCard';
 import EditEventModal from '../components/EditEventModal';
 import AttendanceGrid from '../components/AttendanceGrid';
 import AddUserModal from '../components/AddUserModal';
-
+const { height: screenHeight } = Dimensions.get('window');
 const CalendarScreen = ({navigation}) => {
   const [events, setEvents] = useState({});
   const [selectedDate, setSelectedDate] = useState('');
@@ -38,7 +39,7 @@ const CalendarScreen = ({navigation}) => {
   
             // Add event to the corresponding date in `formattedEvents`
             if (!formattedEvents[dateKey]) {
-              formattedEvents[dateKey] = { marked: true, dotColor: theme.colors.secondary, events: [] };
+              formattedEvents[dateKey] = { marked: true, dotColor: theme.colors.tertiary, events: [] };
             }
             formattedEvents[dateKey].events.push(event);
           });
@@ -51,7 +52,7 @@ const CalendarScreen = ({navigation}) => {
   
       fetchEvents();
     
-    }, [isModalVisible==false])
+    }, [editingEvent==null || navigation])
   );
   const handleDayPress = (day) => {
     setSelectedDate(day.dateString);
@@ -147,21 +148,30 @@ const CalendarScreen = ({navigation}) => {
     attendance={() => handleAttendance(item)}
   />
   );
+  const markedDates = {
+    ...Object.keys(events).reduce((acc, date) => {
+      acc[date] = { marked: true, dotColor: events[date].dotColor };
+      return acc;
+    }, {}),
+    ...(selectedDate && {
+      [selectedDate]: {
+        selected: true,
+        selectedColor: theme.colors.primary,
+        marked: events[selectedDate]?.marked,
+        dotColor: events[selectedDate]?.dotColor,
+      },
+    }),
+  };
   return (
     <View style={styles.container}>
-            <div style={{padding:'16px'}}>
-              <Button title="Add Event" mode="contained" onPress={() => navigation.navigate('AddEventScreen')}>Add Event</Button>
-            </div>
+            <ButtonWrapper title="Add Event" onPress={() => navigation.navigate('AddEventScreen')}></ButtonWrapper>
       <Calendar
-        markedDates={Object.keys(events).reduce((acc, date) => {
-          acc[date] = { marked: true, dotColor: events[date].dotColor };
-          return acc;
-        }, {})}
+        markedDates={markedDates}
         onDayPress={handleDayPress}
-        
+        style={{height: (screenHeight/2)-50}}
       />
       {selectedDate && (
-        <ScrollView style={styles.detailsContainer}>
+        <ScrollView style={[styles.detailsContainer, { height: (screenHeight/2)-50 }]}>
           <Text style={styles.selectedDate}>Events on {selectedDate}:</Text>
           {selectedEvents.length > 0 ? (
             <FlatList
@@ -204,12 +214,11 @@ const CalendarScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
   
-    padding: 10,
+    paddingRight: 30,
+    paddingLeft: 30,
   },
   detailsContainer: {
-
     padding: 10,
-    height: '300px'
   },
   selectedDate: {
     fontSize: 18,

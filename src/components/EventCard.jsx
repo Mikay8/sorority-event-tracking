@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Card, Text, Button } from 'react-native-paper';
+import { Card, Text } from 'react-native-paper';
+import ButtonWrapper from './ButtonWrapper';
 import { useTheme } from 'react-native-paper';
 
 const EventCard = ({ title, description, location, onEdit, attendance }) => {
@@ -13,12 +14,8 @@ const EventCard = ({ title, description, location, onEdit, attendance }) => {
         <Text style={styles.location}>{location}</Text>
       </Card.Content>
       <Card.Actions style={styles.actions}>
-        <Button mode="contained" onPress={onEdit} style={styles.button}>
-          Edit
-        </Button>
-        <Button mode="contained" onPress={attendance} style={styles.button}>
-           Attendance
-        </Button>
+        <ButtonWrapper title="Edit" onPress={onEdit} style={styles.button} />
+        <ButtonWrapper title="Attendance" onPress={attendance} style={styles.button}/>
       </Card.Actions>
     </Card>
   );

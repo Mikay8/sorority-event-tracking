@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Modal, Portal, Text, Button, DataTable,IconButton, MD3Colors } from 'react-native-paper';
+import { Modal, Portal, Text, DataTable,IconButton } from 'react-native-paper';
+import ButtonWrapper from './ButtonWrapper';
 const AttendanceGrid = ({ visible, onDismiss, attendees,removeUser,addUser }) => {
   return (
 
@@ -36,9 +37,8 @@ const AttendanceGrid = ({ visible, onDismiss, attendees,removeUser,addUser }) =>
         ) : (
           <Text style={styles.noAttendeesText}>No attendees for this event.</Text>
         )}
-        <Button mode="contained" onPress={onDismiss} style={styles.closeButton}>
-          Close
-        </Button>
+       
+        <ButtonWrapper title="Close" onPress={onDismiss} />
       </Modal>
  
   );
@@ -63,10 +63,7 @@ const styles = StyleSheet.create({
     color: '#888',
     textAlign: 'center',
     marginVertical: 20,
-  },
-  closeButton: {
-    marginTop: 20,
-  },
+  }
 });
 
 export default AttendanceGrid;

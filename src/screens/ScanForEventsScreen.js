@@ -1,9 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { Card, Text, Button, ActivityIndicator } from 'react-native-paper';
+import { View, ScrollView, StyleSheet, FlatList,Dimensions } from 'react-native';
+import { Card, Text } from 'react-native-paper';
+import ButtonWrapper from '../components/ButtonWrapper';
+import ActivityIndicatorWrapper from '../components/ActivityIndicatorWrapper';
 import { getEvents } from '../services/firestore/events'; // Ensure this points to the correct file
 import { format, isAfter,isEqual } from 'date-fns'; // Install with `npm install date-fns`
 
+const { height: screenHeight } = Dimensions.get('window');
 const ScanForEventsScreen = ({ navigation }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,9 +25,18 @@ const ScanForEventsScreen = ({ navigation }) => {
 
         // Filter upcoming events based on current date
         const currentDate = new Date();
-        const upcomingEvents = fetchedEvents.filter((event) =>
-          isAfter(stringToDate(event.date), currentDate)|| isEqual(stringToDate(event.date), currentDate)// Check if the event date is after the current date
-        );
+        currentDate.setDate(currentDate.getDate() - 1);
+        const upcomingEvents = fetchedEvents.filter((event) => {
+          const eventDate = new Date(...event.date.split('-')
+          .map((val, index) => 
+            index === 1 ? Number(val) - 1 : Number(val)
+          ));
+          return isAfter(eventDate, currentDate); 
+        })
+        .sort((a, b) => 
+          stringToDate(a.date) - stringToDate(b.date
+
+          )); 
 
         setEvents(upcomingEvents);
       } catch (error) {
@@ -38,33 +50,35 @@ const ScanForEventsScreen = ({ navigation }) => {
   }, []);
 
   // Render each event card
-  const renderEventCard = ({ item }) => (
-    <Card style={styles.eventCard}>
-      <Card.Content>
-        <Text style={styles.title}>Title: {item.title}</Text>
-        <Text style={styles.description}>Description: {item.description}</Text>
-        <Text style={styles.location}>Location: {item.location}</Text>
-        <Text style={styles.date}>Date: {format(new Date(item.date), 'MMMM dd, yyyy')}</Text>
-      </Card.Content>
-      <Card.Actions>
-        <Button onPress={() => navigation.navigate('EventScanScreen', { event: item })}>
-          Scan
-        </Button>
-      </Card.Actions>
-    </Card>
-  );
+  const renderEventCard = ({ item }) => {
+    return (
+      <Card style={styles.eventCard}>
+        <Card.Content>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.description}>Description: {item.description}</Text>
+          <Text style={styles.location}>Location: {item.location}</Text>
+          <Text style={styles.date}>Date: {format(stringToDate(item.date), 'dd-MM-yyyy')}</Text>
+        </Card.Content>
+        <Card.Actions>
+          <ButtonWrapper title="Scan" onPress={() => navigation.navigate('EventScanScreen', { event: item })}/>
+        </Card.Actions>
+      </Card>
+    );
+  };
 
   return (
     <View style={styles.container}>
       {loading ? (
-        <ActivityIndicator animating={true} size="large" />
+        <ActivityIndicatorWrapper text ={ "Loading events..."}/>
       ) : events.length > 0 ? (
+       <ScrollView style={{height: screenHeight - 100}}>
         <FlatList
           data={events}
           keyExtractor={(item) => item.id} // Ensure each event has a unique `id`
           renderItem={renderEventCard}
           contentContainerStyle={styles.list}
         />
+       </ScrollView>
       ) : (
         <Text style={styles.noEvents}>No upcoming events found.</Text>
       )}
@@ -74,16 +88,21 @@ const ScanForEventsScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex:1,
+    padding: 20,
+   
+  },
+  detailsContainer: {
+
     padding: 10,
-    backgroundColor: '#fff',
+    flexGrow: 1,
   },
   list: {
     paddingBottom: 16,
   },
   eventCard: {
     marginBottom: 10,
-    backgroundColor: '#f9f9f9',
+    
     borderRadius: 8,
     elevation: 2,
     padding: 8,
@@ -98,16 +117,16 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 14,
-    color: '#666',
+    
   },
   date: {
     fontSize: 14,
-    color: '#888',
+    
     marginTop: 6,
   },
   noEvents: {
     fontSize: 16,
-    color: '#888',
+    
     textAlign: 'center',
     marginTop: 20,
   },

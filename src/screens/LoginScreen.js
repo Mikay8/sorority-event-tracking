@@ -1,36 +1,35 @@
-import React, { useState, useContext } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState, useContext , useEffect} from 'react';
+import { View, StyleSheet, Modal, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
-import { signInWithEmailAndPassword, getAuth } from 'firebase/auth';
-import { auth } from '../firebase';
+import ButtonWrapper from '../components/ButtonWrapper';
 import { AuthContext } from '../context/AuthContext';
 import TextInputWrapper from '../components/TextInputWrapper';
 
 const LoginScreen = () => {
-  const { setUser } = useContext(AuthContext);
-  const [email, setEmail] = useState('');
+  const { signIn } = useContext(AuthContext);
+  const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errorMes, setErrorMes] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   const handleLogin = async () => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      setUser(userCredential.user); // Store user in contex
+      await signIn(`${userId}@sss.com`, password);
     } catch (err) {
       setError(err.message);
+      setModalVisible(true);
     }
   };
 
   return (
     <View style={styles.container}>
-      
+     
       <TextInputWrapper
-        label={"Email"}
-        value={email}
-        onChangeText={setEmail}
-        type="email" // Triggers password validation
+        label={"ID"}
+        value={userId}
+        onChangeText={setUserId}
+        type="required" // Triggers password validation
       />
-      
       <TextInputWrapper
         label={"Password"}
         value={password}
@@ -38,10 +37,8 @@ const LoginScreen = () => {
         type="password" // Triggers password validation
         secureTextEntry
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Button mode="contained" onPress={handleLogin}>
-        Log In
-      </Button>
+      
+      <ButtonWrapper title="Log In" onPress={handleLogin} />
     </View>
   );
 };
